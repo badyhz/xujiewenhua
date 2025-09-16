@@ -712,5 +712,13 @@ function archetypeFit(actual, target){
   updateAll();
 })();
 </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="bridge.js"></script>
+<script>
+  // 可选：把后台的最新配置灌进 localStorage，让前端显示使用后台命名/权重
+  Bridge.loadConfigToLocal();
+</script>
+
 </body>
 </html>\n    ${ (showFusion && showFusion.checked) ? `<span class=\"badge\">融合：<b>${industrySelect.value}×${transIndustrySelect.value}</b>（w=${parseFloat(wMainInput.value||0.6).toFixed(2)}/${parseFloat(wTransInput.value||0.4).toFixed(2)}, γ=${parseFloat(gammaInput.value||0.15).toFixed(2)}）</span>` : '' }
