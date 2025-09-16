@@ -54,4 +54,12 @@ document.getElementById('saveBtn').onclick=()=>{
   alert('Step1 已保存'); location.href='step2.html';
 };
 </script>
-</div></body></html>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="bridge.js"></script>
+<script>
+  // 可选：把后台的最新配置灌进 localStorage，让前端显示使用后台命名/权重
+  Bridge.loadConfigToLocal();
+</script>
+
+</body></html>
