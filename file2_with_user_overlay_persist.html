@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>雷达图叠加框架（原5条不动 + 14原型可选）</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+
+// ---- 永久保留“我的”数据集（_mine）工具 ----
+function preserveMine(chart){
+  if(!chart) return [];
+  return (chart.data.datasets||[]).filter(ds=>ds && ds._mine);
+}
+
+function loadMyFromDashboard(persistOnly=false){
+  let my = {ecology16:[], potentialSelf8:[], potentialEnv8:[]};
+  try{ my = JSON.parse(localStorage.getItem('dashboardUser')||'{}') || my; }catch(e){}
+  const e16 = Array.isArray(my.ecology16) && my.ecology16.length===16 ? my.ecology16.map(Number) : null;
+  const pSelf = Array.isArray(my.potentialSelf8) && my.potentialSelf8.length===8 ? my.potentialSelf8.map(Number) : null;
+  const pEnv  = Array.isArray(my.potentialEnv8)  && my.potentialEnv8.length===8  ? my.potentialEnv8.map(Number)  : null;
+
+  // 清除旧的“我的”层（保持其它原型叠加不变）
+  function removeMine(chart){
+    if(!chart) return;
+    chart.data.datasets = (chart.data.datasets||[]).filter(ds=>!(ds && ds._mine));
+    chart.update();
+  }
+  removeMine(ecoChart); removeMine(potChart);
+
+  if (typeof ecoChart!=='undefined' && e16){
+    ecoChart.data.datasets.unshift({
+      label: '我的·生态',
+      data: e16,
+      borderColor: '#22d3ee',
+      backgroundColor: 'rgba(34,211,238,.12)',
+      pointRadius: 2,
+      _mine:true
+    });
+    ecoChart.update();
+  }
+
+  if (typeof potChart!=='undefined'){
+    if (pSelf){
+      potChart.data.datasets.unshift({
+        label: '我的·潜力（自评）',
+        data: pSelf,
+        borderColor: '#34d399',
+        backgroundColor: 'rgba(52,211,153,.10)',
+        pointRadius: 2,
+        _mine:true
+      });
+    }
+    if (pEnv){
+      potChart.data.datasets.unshift({
+        label: '我的·潜力（环境）',
+        data: pEnv,
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245,158,11,.08)',
+        pointRadius: 2,
+        borderDash:[6,4],
+        _mine:true
+      });
+    }
+    potChart.update();
+  }
+}
+
+
+// 自动同步：监听 localStorage 变化（跨标签页可用；同页点击“同步”也会触发）
+window.addEventListener('storage', function(ev){
+  if(ev && ev.key==='dashboardUser'){ try{ loadMyFromDashboard(); }catch(e){} }
+});
+// 进入页面即加载一次
+try{ loadMyFromDashboard(); }catch(e){ console.warn(e); }
+// 若首次没有 dashboardUser，也尝试直接从 overlayMine 恢复
+try{ if(!localStorage.getItem('dashboardUser') && localStorage.getItem('overlayMine')) loadMyFromDashboard(true); }catch(e){}
+
+document.getElementById("refreshMine") && document.getElementById("refreshMine").addEventListener("click", function(){ try{ loadMyFromDashboard(); }catch(e){} });
+</script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body{margin:0;background:#0b1020;color:#e6eaf2;font-family:'Noto Sans SC',system-ui,sans-serif}
+    .wrap{max-width:1280px;margin:0 auto;padding:18px}
+    h1{font-size:18px;margin:0 0 12px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:980px){.grid{grid-template-columns:1fr}}
+    .card{background:#0f1526;border:1px solid #1f2740;border-radius:14px;padding:14px}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+    select,button{background:#0f172a;color:#e6eaf2;border:1px solid #2a3a5a;border-radius:10px;padding:8px 10px}
+    button{cursor:pointer}
+    .help{color:#9fb1cf;font-size:12px}
+    canvas{max-width:100%}
+    .chip{display:inline-block;border:1px dashed #365a9b;color:#9fc7ff;padding:2px 8px;border-radius:999px;font-size:12px;margin-right:6px;margin-top:6px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>雷达叠加框架 · 保留原 5 条线（不改动），此处新增「14 原型叠加对比」</h1>
+    <div class="toolbar">
+<button id="refreshMine">刷新我的数值</button>
+      <span class="help">说明：原页面的 5 条曲线仍在你已有的 <b>radarOne</b> 图上。本页面新增两张对比雷达（生态16维 / 潜力8维），仅用于叠加 14 原型，互不干扰。</span>
+    </div>
+
+    <div class="card">
+      <div class="toolbar">
+<button id="refreshMine">刷新我的数值</button>
+        <label>原型多选（最多 4 条）：</label>
+        <select id="protoSelect" multiple size="4" style="min-width:320px"></select>
+        <button id="apply">叠加到下方两张雷达</button>
+        <button id="clear">清空叠加</button>
+        <span class="help">提示：生态线为实线；潜力线为虚线。</span>
+      </div>
+      <div id="legend"></div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h3>生态 16 维 · 原型对比雷达</h3>
+        <canvas id="ecoRadar" height="360"></canvas>
+      </section>
+      <section class="card">
+        <h3>潜力 8 维 · 原型对比雷达</h3>
+        <canvas id="potRadar" height="360"></canvas>
+      </section>
+    </div>
+
+    <div class="card">
+      <h3>如何嵌入到你现有页面？</h3>
+      <ol>
+        <li>在原页面不做任何改动，保留你现有的 <b>radarOne</b>（5 条曲线）。</li>
+        <li>把本模块这段 HTML 放在原页面的下方区域（或以 iframe 嵌入）。</li>
+        <li>原型叠加仅绘制在本模块的两张新雷达上，不会影响原图；需要时可把本模块的 <code>PROTOTYPES</code> 与你后台数据对接。</li>
+      </ol>
+    </div>
+  </div>
+
+<script>
+const ECO_LABELS = ["信任启动度","协作质量","关系韧性","影响半径","目标推进力","节奏管理","适应效率","学习与迁移","沟通清晰","冲突修复","情绪稳定","视角采择","归因风格","界限与支持","可信兑现","复盘迭代"];
+const POT_LABELS = ["创新潜力","学习潜力","科研潜力","领导潜力","社交潜力","幸福潜力","艺术潜力","创业潜力"];
+
+// 14 原型（生态16 + 潜力8）——潜力使用你的系统 8 维：创新/学习/科研/领导/社交/幸福/艺术/创业
+const PROTOTYPES = [
+  {id:"career_iron", name:"事业｜铁军推进型", ecology:[70,85,65,80,90,80,75,60,70,60,70,60,60,60,85,70], potential:[65,60,55,90,70,65,50,85]},
+  {id:"career_mentor", name:"事业｜导师关系型", ecology:[90,85,85,75,70,70,65,65,80,80,80,75,75,75,75,70], potential:[60,70,65,70,90,85,60,55]},
+  {id:"career_innovator", name:"事业｜创新探索型", ecology:[70,75,65,85,75,70,85,90,70,65,65,80,70,60,70,80], potential:[90,85,75,65,70,65,70,80]},
+  {id:"career_balance", name:"事业｜平衡稳健型", ecology:[75,80,75,70,80,85,70,70,75,75,75,70,70,70,80,75], potential:[70,75,70,75,75,80,65,65]},
+  {id:"career_strategy", name:"事业｜战略导航型", ecology:[75,75,70,90,80,85,70,80,75,70,65,75,80,70,80,75], potential:[75,70,70,85,75,70,65,70]},
+  {id:"career_crisis", name:"事业｜危机调度型", ecology:[70,75,70,70,75,85,90,70,70,70,80,65,65,65,75,75], potential:[70,65,70,80,65,70,60,75]},
+  {id:"life_guardian", name:"生活｜家庭守护型", ecology:[80,75,90,65,65,75,65,65,70,80,85,70,75,85,75,70], potential:[55,65,60,60,80,90,60,50]},
+  {id:"life_empathy", name:"生活｜情感共鸣型", ecology:[75,70,80,70,65,70,65,65,80,80,85,85,80,70,70,70], potential:[60,65,60,55,85,90,70,50]},
+  {id:"life_friendship", name:"生活｜友情连接型", ecology:[85,70,75,85,65,70,65,70,70,70,75,70,70,65,70,65], potential:[55,60,55,60,90,80,65,55]},
+  {id:"life_growth", name:"生活｜成长陪伴型", ecology:[70,70,80,65,65,80,70,90,70,70,70,70,70,70,70,80], potential:[70,85,75,65,70,80,65,60]},
+  {id:"life_social", name:"生活｜社交活力型", ecology:[90,70,70,90,70,65,65,65,70,65,70,70,65,60,65,65], potential:[60,65,55,65,95,85,70,70]},
+  {id:"life_calm", name:"生活｜内心安定型", ecology:[70,65,85,60,60,80,60,60,65,70,95,70,75,75,70,70], potential:[55,65,70,60,70,95,65,55]},
+  {id:"extreme_lonewolf", name:"极端｜孤狼型成功", ecology:[50,55,45,70,95,70,85,90,60,55,50,70,65,55,65,80], potential:[90,80,75,95,50,55,60,90]},
+  {id:"extreme_symbiosis", name:"极端｜共生型成功", ecology:[95,85,95,85,60,70,60,60,75,80,90,75,75,85,75,70], potential:[55,65,60,60,95,90,70,55]}
+];
+
+// 填充下拉
+const sel = document.getElementById('protoSelect');
+PROTOTYPES.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; sel.appendChild(o); });
+
+// 初始化雷达
+const ecoCtx = document.getElementById('ecoRadar');
+const potCtx = document.getElementById('potRadar');
+
+const ecoChart = new Chart(ecoCtx, {
+  type:'radar',
+  data:{ labels:ECO_LABELS, datasets:[] },
+  options:{ plugins:{legend:{labels:{color:'#cbd5e1'}}}, scales:{r:{suggestedMin:0,suggestedMax:100,angleLines:{color:'#1d2b4b'},grid:{color:'#1d2b4b'},pointLabels:{color:'#9fb1cf'}}} }
+});
+
+const potChart = new Chart(potCtx, {
+  type:'radar',
+  data:{ labels:POT_LABELS, datasets:[] },
+  options:{ plugins:{legend:{labels:{color:'#cbd5e1'}}}, scales:{r:{suggestedMin:0,suggestedMax:100,angleLines:{color:'#1d2b4b'},grid:{color:'#1d2b4b'},pointLabels:{color:'#9fb1cf'}}} }
+});
+
+
+
+// === 读取来自文件1注入的我的结果，并叠加到两张雷达 ===
+(function(){
+  let my = {ecology16:[], potentialSelf8:[], potentialEnv8:[]};
+  try{ my = JSON.parse(localStorage.getItem('dashboardUser')||'{}') || my; }catch(e){}
+  const e16 = Array.isArray(my.ecology16) && my.ecology16.length===16 ? my.ecology16.map(Number) : null;
+  const pSelf = Array.isArray(my.potentialSelf8) && my.potentialSelf8.length===8 ? my.potentialSelf8.map(Number) : null;
+  const pEnv  = Array.isArray(my.potentialEnv8)  && my.potentialEnv8.length===8  ? my.potentialEnv8.map(Number)  : null;
+
+  // 辅助：潜力 8 维的点标签（分布在 16 个方位上，仅8个点有标签）
+  function potPointLabels16(){
+    const labels16 = new Array(16).fill("");
+    const names = ["创新潜力","领导潜力","艺术潜力","学习潜力","社交潜力","创业潜力","科研潜力","幸福潜力"];
+    const anchors = [0,2,4,6,8,10,12,14];
+    anchors.forEach((k,i)=> labels16[k] = names[i]);
+    return labels16;
+  }
+
+  if (typeof ecoChart!=='undefined' && e16){
+    ecoChart.data.datasets.unshift({
+      label: '我的·生态',
+      data: e16,
+      borderColor: '#22d3ee',
+      backgroundColor: 'rgba(34,211,238,.12)',
+      pointRadius: 2,
+      _pointLabels: ECO_LABELS.slice(),     // 每个点标生态标签
+      _labelColor: '#a8e3ff'
+    });
+    ecoChart.update();
+  }
+
+  if (typeof potChart!=='undefined'){
+    if (pSelf){
+      potChart.data.datasets.unshift({
+        label: '我的·潜力（自评）',
+        data: pSelf,
+        borderColor: '#34d399',
+        backgroundColor: 'rgba(52,211,153,.10)',
+        pointRadius: 2,
+        _pointLabels: potPointLabels16(),
+        _labelColor: '#b9f2d9'
+      });
+    }
+    if (pEnv){
+      potChart.data.datasets.unshift({
+        label: '我的·潜力（环境）',
+        data: pEnv,
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245,158,11,.08)',
+        pointRadius: 2,
+        borderDash:[6,4],
+        _pointLabels: potPointLabels16(),
+        _labelColor: '#ffe0a3'
+      });
+    }
+
+    // 注册一个小插件：把 _pointLabels 画出来（不影响已有渲染）
+    const PointLabelPlugin = {
+      id:'pointLabels',
+      afterDatasetsDraw(chart){
+        const {ctx, data} = chart; ctx.save();
+        data.datasets.forEach((ds, di)=>{
+          const meta = chart.getDatasetMeta(di);
+          if(!meta || !meta.data) return;
+          const labels = ds._pointLabels || [];
+          const color = ds._labelColor || '#9fb1ff';
+          ctx.font = '10px "Noto Sans SC", sans-serif';
+          ctx.fillStyle = color;
+          labels.forEach((txt,i)=>{
+            if(!txt || !meta.data[i]) return;
+            const p = meta.data[i].tooltipPosition();
+            ctx.fillText(txt, p.x+6, p.y-6);
+          });
+        });
+        ctx.restore();
+      }
+    };
+    if (typeof Chart!=='undefined') { try{ Chart.register(PointLabelPlugin); }catch(e){} }
+    potChart.update();
+  }
+})();
+
+function randColor(){
+  const h = Math.floor(Math.random()*360);
+  return {stroke:`hsl(${h} 90% 70%)`, fill:`hsla(${h} 90% 55% / .12)`};
+}
+
+function apply(){
+  // 先保留“我的”数据集
+  ecoChart.data.datasets = preserveMine(ecoChart);
+  potChart.data.datasets = preserveMine(potChart);
+
+  // 最多 4 条，避免重叠看不清
+  const selected = Array.from(sel.selectedOptions).slice(0,4).map(o=>o.value);
+  ecoChart.data.datasets = (ecoChart.data.datasets||[]).filter(ds=>ds && ds._mine);
+  potChart.data.datasets = (potChart.data.datasets||[]).filter(ds=>ds && ds._mine);
+  const legend = document.getElementById('legend');
+  legend.innerHTML='';
+  selected.forEach(id=>{
+    const p = PROTOTYPES.find(x=>x.id===id); if(!p) return;
+    const c = randColor();
+    ecoChart.data.datasets.push({label:`生态｜${p.name}`, data:p.ecology, borderColor:c.stroke, backgroundColor:c.fill, pointRadius:2});
+    potChart.data.datasets.push({label:`潜力｜${p.name}`, data:p.potential, borderColor:c.stroke, backgroundColor:'transparent', borderDash:[6,4], pointRadius:2});
+    const chip = document.createElement('span'); chip.className='chip'; chip.textContent=p.name; legend.appendChild(chip);
+  });
+  ecoChart.update(); potChart.update();
+}
+document.getElementById('apply').addEventListener('click',apply);
+document.getElementById('clear').addEventListener('click',()=>{
+  sel.selectedIndex=-1; ecoChart.data.datasets = (ecoChart.data.datasets||[]).filter(ds=>ds && ds._mine); potChart.data.datasets = (potChart.data.datasets||[]).filter(ds=>ds && ds._mine); ecoChart.update(); potChart.update(); document.getElementById('legend').innerHTML='';
+});
+
+function loadMyFromDashboard(persistOnly=false){
+  let my = {ecology16:[], potentialSelf8:[], potentialEnv8:[]};
+  try{ my = JSON.parse(localStorage.getItem('dashboardUser')||'{}') || my; }catch(e){}
+  const e16 = Array.isArray(my.ecology16) && my.ecology16.length===16 ? my.ecology16.map(Number) : null;
+  const pSelf = Array.isArray(my.potentialSelf8) && my.potentialSelf8.length===8 ? my.potentialSelf8.map(Number) : null;
+  const pEnv  = Array.isArray(my.potentialEnv8)  && my.potentialEnv8.length===8  ? my.potentialEnv8.map(Number)  : null;
+
+  // 清除旧的“我的”层（保持其它原型叠加不变）
+  function removeMine(chart){
+    if(!chart) return;
+    chart.data.datasets = (chart.data.datasets||[]).filter(ds=>!(ds && ds._mine));
+    chart.update();
+  }
+  removeMine(ecoChart); removeMine(potChart);
+
+  if (typeof ecoChart!=='undefined' && e16){
+    ecoChart.data.datasets.unshift({
+      label: '我的·生态',
+      data: e16,
+      borderColor: '#22d3ee',
+      backgroundColor: 'rgba(34,211,238,.12)',
+      pointRadius: 2,
+      _mine:true
+    });
+    ecoChart.update();
+  }
+
+  if (typeof potChart!=='undefined'){
+    if (pSelf){
+      potChart.data.datasets.unshift({
+        label: '我的·潜力（自评）',
+        data: pSelf,
+        borderColor: '#34d399',
+        backgroundColor: 'rgba(52,211,153,.10)',
+        pointRadius: 2,
+        _mine:true
+      });
+    }
+    if (pEnv){
+      potChart.data.datasets.unshift({
+        label: '我的·潜力（环境）',
+        data: pEnv,
+        borderColor: '#f59e0b',
+        backgroundColor: 'rgba(245,158,11,.08)',
+        pointRadius: 2,
+        borderDash:[6,4],
+        _mine:true
+      });
+    }
+    potChart.update();
+  }
+}
+
+
+// 自动同步：监听 localStorage 变化（跨标签页可用；同页点击“同步”也会触发）
+window.addEventListener('storage', function(ev){
+  if(ev && ev.key==='dashboardUser'){ try{ loadMyFromDashboard(); }catch(e){} }
+});
+// 进入页面即加载一次
+try{ loadMyFromDashboard(); }catch(e){ console.warn(e); }
+// 若首次没有 dashboardUser，也尝试直接从 overlayMine 恢复
+try{ if(!localStorage.getItem('dashboardUser') && localStorage.getItem('overlayMine')) loadMyFromDashboard(true); }catch(e){}
+
+document.getElementById("refreshMine") && document.getElementById("refreshMine").addEventListener("click", function(){ try{ loadMyFromDashboard(); }catch(e){} });
+</script>
+</body>
+</html>

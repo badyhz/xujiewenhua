@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>后台管理 · 维度/权重/题库/标签</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#0b1020;--card:#121833;--ink:#e7ecff;--muted:#a4afd7;--line:#1c2447;--pri:#6c8cff}
+*{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,#0b1020,#0e1430);color:var(--ink);font-family:'Noto Sans SC',system-ui}
+.wrap{max-width:1200px;margin:22px auto 80px;padding:14px}
+.h1{font-size:24px;font-weight:800;margin:6px 0 12px}
+.card{background:linear-gradient(180deg,#121833,#0f1733);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}}
+label{font-size:12px;color:var(--muted)}
+input,select,button,textarea{background:#0c1433;color:#e7ecff;border:1px solid #2a3b7a;border-radius:8px;padding:8px;font-size:13px}
+button{background:var(--pri);border-color:#7a95ff;cursor:pointer}
+table{width:100%;border-collapse:separate;border-spacing:0 6px}
+th,td{font-size:12px;color:#dbe3ff;padding:8px;border:1px solid #2a3b7a;background:#0b1230}
+th{background:#0f1b3d;color:#e7efff}
+.small{font-size:12px;color:#9fb1ff}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.badge{display:inline-flex;gap:6px;align-items:center;border:1px solid #2a3b7a;border-radius:999px;padding:2px 8px;font-size:11px}
+.ok{border-color:#34d399;color:#d8fff1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="h1">后台管理 ·（Supabase直连）</div>
+  <div class="card">
+    <div class="row">
+      <label>SUPABASE_URL <input id="url" style="min-width:380px" placeholder="https://xxx.supabase.co"/></label>
+      <label>ANON_KEY <input id="key" style="min-width:380px" placeholder="eyJhbGciOi..."/></label>
+      <button id="connect">连接</button>
+      <span id="connState" class="badge">未连接</span>
+      <button id="seed">一键导入：维度 & 题库 & 标签（示例）</button>
+      <button id="exportAll">导出全部配置 JSON</button>
+      <a href="dashboard.html" class="badge ok">打开 Dashboard</a>
+    </div>
+    <div class="small" style="margin-top:6px">提示：首次使用请在 Supabase Studio 运行我给你的 <b>schema.sql</b>；然后在此填入 URL + ANON KEY，点击“连接”。</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>维度管理（dimensions）</h3>
+      <div class="row">
+        <select id="dtype">
+          <option>STRUCT</option><option>ECO</option><option>POT</option><option>TEAM</option><option>PROJ</option>
+        </select>
+        <input id="dkey" placeholder="key/英文或代码"/>
+        <input id="dname" placeholder="显示名称"/>
+        <input id="dorder" type="number" placeholder="排序"/>
+        <button id="addDim">新增/更新</button>
+      </div>
+      <table id="dimTable"><thead><tr><th>dtype</th><th>key</th><th>name</th><th>order</th><th>操作</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card">
+      <h3>权重预设（weight_presets）</h3>
+      <div class="row">
+        <input id="wcode" placeholder="insight/experience/balanced/custom"/>
+        <textarea id="wjson" rows="4" style="min-width:420px" placeholder='{"structure":{"essence":0.5,"env":0.2,"calib":0.3},"potential":{"essence":0.5,"env":0.2,"calib":0.3}}'></textarea>
+        <button id="saveW">保存/更新</button>
+      </div>
+      <table id="wTable"><thead><tr><th>code</th><th>weights</th><th>操作</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>题库（questions：Step1/3）</h3>
+      <div class="row">
+        <select id="qstep"><option value="1">Step1</option><option value="3">Step3</option></select>
+        <input id="qcode" placeholder="S1_Q01"/>
+        <input id="qtext" placeholder="题干"/>
+        <input id="qdim" placeholder="映射维度key（可空）"/>
+        <input id="qweight" type="number" step="0.1" value="1"/>
+        <button id="addQ">新增/更新</button>
+      </div>
+      <table id="qTable"><thead><tr><th>step</th><th>code</th><th>text</th><th>dim_key</th><th>weight</th><th>操作</th></tr></thead><tbody></tbody></table>
+    </div>
+    <div class="card">
+      <h3>标签（tags：Step2 的 200 标签）</h3>
+      <div class="row">
+        <input id="tid" placeholder="T001"/>
+        <input id="tname" placeholder="标签名"/>
+        <input id="tcat" placeholder="分类"/>
+        <input id="tdim" placeholder="映射维度key（可空）"/>
+        <button id="addTag">新增/更新</button>
+      </div>
+      <table id="tTable"><thead><tr><th>id</th><th>name</th><th>category</th><th>dim_key</th><th>操作</th></tr></thead><tbody></tbody></table>
+    </div>
+  </div>
+
+  <div class="card small">
+    <b>提示：</b>前端页面可在 <code>&lt;head&gt;</code> 或 <code>&lt;/body&gt;</code> 引入 <code>bridge.js</code> 与 Supabase SDK；调用 <code>Bridge.loadConfigToLocal()</code> 把最新配置写入 <code>localStorage</code>，这样 <b>Dashboard</b> 与 <b>Step1-4</b> 就能使用后台的维度命名与权重。
+  </div>
+</div>
+
+<script>
+let client = null;
+
+function $(id){ return document.getElementById(id); }
+
+function toast(msg){ console.log(msg); }
+
+function setTableBody(tbId, rowsHtml){ $(tbId).querySelector('tbody').innerHTML = rowsHtml; }
+
+$('connect').addEventListener('click', async ()=>{
+  client = window.supabase.createClient($('url').value.trim(), $('key').value.trim());
+  $('connState').textContent = '已连接';
+  await refreshAll();
+});
+
+async function refreshAll(){
+  await Promise.all([loadDims(), loadWeights(), loadQs(), loadTags()]);
+}
+
+async function loadDims(){
+  const { data, error } = await client.from('dimensions').select('*').order('dtype, order');
+  if(error) return toast(error.message);
+  const html = (data||[]).map(r=>`<tr>
+    <td>${r.dtype}</td><td>${r.key}</td><td>${r.name}</td><td>${r.order}</td>
+    <td><button onclick="delDim('${r.id}')">删除</button></td></tr>`).join('');
+  setTableBody('dimTable', html);
+}
+
+async function loadWeights(){
+  const { data, error } = await client.from('weight_presets').select('*').order('code');
+  if(error) return toast(error.message);
+  const html = (data||[]).map(r=>`<tr>
+    <td>${r.code}</td><td><pre style="white-space:pre-wrap">${JSON.stringify(r.weights)}</pre></td>
+    <td><button onclick="delW('${r.id}')">删除</button></td></tr>`).join('');
+  setTableBody('wTable', html);
+}
+
+async function loadQs(){
+  const { data, error } = await client.from('questions').select('*').order('step, code');
+  if(error) return toast(error.message);
+  const html = (data||[]).map(r=>`<tr>
+    <td>${r.step}</td><td>${r.code}</td><td>${r.text}</td><td>${r.dim_key||''}</td><td>${r.weight||1}</td>
+    <td><button onclick="delQ('${r.id}')">删除</button></td></tr>`).join('');
+  setTableBody('qTable', html);
+}
+
+async function loadTags(){
+  const { data, error } = await client.from('tags').select('*').order('id');
+  if(error) return toast(error.message);
+  const html = (data||[]).map(r=>`<tr>
+    <td>${r.id}</td><td>${r.name}</td><td>${r.category}</td><td>${r.dim_key||''}</td>
+    <td><button onclick="delTag('${r.id}')">删除</button></td></tr>`).join('');
+  setTableBody('tTable', html);
+}
+
+$('addDim').addEventListener('click', async ()=>{
+  const payload = { dtype: $('dtype').value, key: $('dkey').value.trim(), name: $('dname').value.trim(), order: Number($('dorder').value||0) };
+  const { error } = await client.from('dimensions').upsert(payload);
+  if(error) return toast(error.message);
+  await loadDims();
+});
+
+$('saveW').addEventListener('click', async ()=>{
+  let weights = {};
+  try{ weights = JSON.parse($('wjson').value); } catch(e){ return toast('weights 不是合法 JSON'); }
+  const payload = { code: $('wcode').value.trim(), weights };
+  const { error } = await client.from('weight_presets').upsert(payload);
+  if(error) return toast(error.message);
+  await loadWeights();
+});
+
+$('addQ').addEventListener('click', async ()=>{
+  const payload = { step: Number($('qstep').value), code: $('qcode').value.trim(), text: $('qtext').value.trim(), dim_key: $('qdim').value.trim()||null, weight: Number($('qweight').value||1) };
+  const { error } = await client.from('questions').upsert(payload);
+  if(error) return toast(error.message);
+  await loadQs();
+});
+
+$('addTag').addEventListener('click', async ()=>{
+  const payload = { id: $('tid').value.trim(), name: $('tname').value.trim(), category: $('tcat').value.trim(), dim_key: $('tdim').value.trim()||null };
+  const { error } = await client.from('tags').upsert(payload);
+  if(error) return toast(error.message);
+  await loadTags();
+});
+
+window.delDim = async (id)=>{ await client.from('dimensions').delete().eq('id', id); await loadDims(); }
+window.delW   = async (id)=>{ await client.from('weight_presets').delete().eq('id', id); await loadWeights(); }
+window.delQ   = async (id)=>{ await client.from('questions').delete().eq('id', id); await loadQs(); }
+window.delTag = async (id)=>{ await client.from('tags').delete().eq('id', id); await loadTags(); }
+
+$('exportAll').addEventListener('click', async ()=>{
+  const [dims, weights, qs, tags] = await Promise.all([
+    client.from('dimensions').select('*').order('dtype, order'),
+    client.from('weight_presets').select('*').order('code'),
+    client.from('questions').select('*').order('step, code'),
+    client.from('tags').select('*').order('id')
+  ]);
+  const blob = new Blob([ JSON.stringify({
+    dimensions: dims.data||[],
+    weight_presets: weights.data||[],
+    questions: qs.data||[],
+    tags: tags.data||[]
+  }, null, 2) ], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'backend_config_export.json';
+  document.body.appendChild(a); a.click(); a.remove();
+});
+
+// Optional seed: put a few samples to start quickly
+$('seed').addEventListener('click', async ()=>{
+  const dims = [
+    {dtype:'STRUCT', key:'mirror', name:'镜面（觉察）', order:1},
+    {dtype:'STRUCT', key:'muscle', name:'筋骨（闭环力）', order:2},
+    {dtype:'ECO', key:'trust', name:'信任速度', order:1},
+    {dtype:'ECO', key:'coop', name:'协作质量', order:2},
+    {dtype:'POT', key:'lead', name:'领导潜力', order:1},
+    {dtype:'POT', key:'innov', name:'创新潜力', order:2}
+  ];
+  await client.from('dimensions').upsert(dims);
+  await client.from('weight_presets').upsert({code:'custom', weights: {"structure":{"essence":0.5,"env":0.2,"calib":0.3},"potential":{"essence":0.5,"env":0.2,"calib":0.3}}});
+  await client.from('tags').upsert({id:'T001', name:'开场自我揭示', category:'信任速度', dim_key:'trust'});
+  await refreshAll();
+});
+</script>
+</body>
+</html>

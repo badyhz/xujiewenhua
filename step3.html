@@ -1,0 +1,244 @@
+
+"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Step 3 · 咨询师纠偏 · 80 道判断题</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--card:#121833;--ink:#e7ecff;--muted:#98a1c0;--brand:#6c8cff;--line:#1c2447}
+*{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,#0b1020,#0e1430);color:var(--ink);font-family:'Noto Sans SC',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+.wrap{max-width:1150px;margin:22px auto 80px;padding:14px}
+.h1{font-size:26px;font-weight:700;margin:6px 0 12px}
+.card{background:linear-gradient(180deg,#121833,#0f1733);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.btn{padding:8px 14px;border-radius:8px;background:#6c8cff;color:#fff;margin-right:6px;text-decoration:none;border:1px solid #7a95ff;cursor:pointer}
+.pill{padding:4px 10px;border:1px solid #2a3b7a;border-radius:12px;font-size:12px;color:#c9d4ff}
+.q{padding:10px;border:1px dashed #2a3b7a;border-radius:12px;background:#0c1433;margin:8px 0}
+.badge{display:inline-block;padding:2px 6px;border-radius:8px;border:1px solid #2a3b7a;font-size:11px;margin-left:6px;color:#a7b4ff}
+.row{display:flex;gap:16px;flex-wrap:wrap}
+.col{flex:1 1 360px;min-width:320px}
+.tf{display:inline-flex;gap:8px;border:1px solid #2a3b7a;border-radius:10px;overflow:hidden}
+.tf button{border:0;background:#0b1230;color:#cfe0ff;padding:6px 10px;cursor:pointer}
+.tf button.on{background:#6c8cff;color:#fff}
+.bar{position:relative;height:10px;width:100%;background:#0b1230;border:1px solid #2a3b7a;border-radius:999px;overflow:hidden;margin:6px 0 10px 0}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#6c8cff,#9aaeff)}
+.bar .val{position:absolute;right:6px;top:-18px;font-size:11px;color:#b9c4ff}
+.small{font-size:12px;color:#9fb1ff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="h1">Step 3 · 咨询师纠偏 · 80 道判断题</div>
+  <div class="card small">
+    <div><b>定位：</b>Step1 为“自评”；Step2/Step3 为“咨询师询问并评价”。本页 80 道判断题用于对 Step1 进行<b>校准/纠偏</b>。</div>
+    <div style="margin-top:6px"><b>评分：</b>“是”记 1 分，“否”记 0 分；每题映射到 8 个结构维度之一（每维 10 题，共 80 题）。保存后自动生成：</div>
+    <ul>
+      <li>step3_struct（8 维结构，0–100）</li>
+      <li>step3_eco16（16 维生态，由结构推导，0–100）</li>
+      <li>dashboard 中可对比：自评（80） vs 标签+60 vs 纠偏（本页）</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom:10px">
+      <a class="btn" href="step1.html">回到 Step1</a>
+      <a class="btn" href="step2.html">Step2 标签</a>
+      <a class="btn" href="dashboard.html">Dashboard</a>
+      <button class="btn" id="saveBtn">保存纠偏结果</button>
+      <span class="pill">操作：点击“是/否”切换</span>
+    </div>
+    <div id="qBox"></div>
+  </div>
+
+  <div class="card">
+    <b>实时统计（结构 8 维）</b>
+    <div id="stats"></div>
+  </div>
+</div>
+
+<script>
+const AXES = ["指南针（方向）","盾牌（情绪稳定）","镜面（觉察）","筋骨（闭环力）","岩石（韧性）","火焰（能量）","水流（灵活）","桥梁（连接）"];
+
+// 每个结构 10 题 = 80 题
+const BANK = {
+  "指南针（方向）": [
+    "TA 是否在长期目标上保持一致路径？",
+    "面对诱惑，TA 是否仍按既定方向推进？",
+    "关键抉择时，TA 能否先对齐『为什么做』？",
+    "遇到压力时，TA 是否仍围绕核心价值取舍？",
+    "计划受阻时，TA 是否会修正路径而非放弃方向？",
+    "跨情境切换时，TA 的决策标准是否保持一致？",
+    "TA 是否能把个人方向翻译成团队可执行路径？",
+    "短期收益诱惑下，TA 是否愿意为长期方向让步？",
+    "TA 是否定期回看方向并做小幅校准？",
+    "他人质疑时，TA 是否能稳定表达并坚守方向？"
+  ],
+  "盾牌（情绪稳定）": [
+    "突发冲突时，TA 是否能迅速回到理性？",
+    "高压下，TA 是否避免情绪化决策？",
+    "面对批评，TA 是否能区分事实与情绪？",
+    "连续挫折后，TA 是否维持基本作息与节律？",
+    "TA 是否具备稳定的自我安抚/复原手段？",
+    "多人场合中，TA 是否不会把负面情绪外溢？",
+    "关键节点，TA 是否少见“情绪截胡”任务？",
+    "关系拉扯中，TA 是否不以情感勒索推进？",
+    "急迫时期，TA 是否仍能平和沟通？",
+    "收集到坏消息时，TA 是否能先暂停再判断？"
+  ],
+  "镜面（觉察）": [
+    "TA 是否能觉察到自身偏好与盲区？",
+    "TA 是否能捕捉到团队注意力/动力的变化？",
+    "TA 是否经常在行动后做事实性复盘？",
+    "TA 是否能区分事实、推断与情绪叙事？",
+    "遇到模糊问题，TA 是否先澄清问题定义？",
+    "TA 是否能识别自己何时需要外部帮助？",
+    "TA 能否在对话中辨别对方真实关切？",
+    "TA 是否能把零散信息整理为线索？",
+    "TA 是否能察觉‘我可能错了’并调参？",
+    "TA 是否把洞察转化为下一步实验？"
+  ],
+  "筋骨（闭环力）": [
+    "目标拆解是否包含明确的验收标准？",
+    "TA 是否跟踪关键里程碑并做风险预案？",
+    "跨人协作时，TA 是否明确角色与边界？",
+    "TA 是否对承诺事项按期交付？",
+    "TA 是否会补上‘收尾动作’避免尾巴？",
+    "流程是否形成 SOP 而非临时发挥？",
+    "遇到阻塞，TA 是否主动升级/协调资源？",
+    "TA 是否把经验固化为模板/清单？",
+    "复杂项目中，TA 是否能维持节奏与秩序？",
+    "交付后，TA 是否进行质量回溯与改进？"
+  ],
+  "岩石（韧性）": [
+    "长期拉锯任务中，TA 是否保持持续输出？",
+    "外界波动时，TA 是否维持基本稳定？",
+    "艰难期，TA 是否仍维持底线与边界？",
+    "挫败后，TA 是否能快速恢复训练节律？",
+    "资源不足时，TA 是否通过替代方案坚持？",
+    "长期目标中，TA 是否愿意承受延迟满足？",
+    "当成果短期不可见时，TA 是否坚持行动？",
+    "连续冲刺后，TA 是否注意长期体力恢复？",
+    "关键阶段，TA 是否能扛住‘看不到结果’的焦虑？",
+    "长期压力场景，TA 是否能维持关系稳定？"
+  ],
+  "火焰（能量）": [
+    "TA 是否经常主动点燃团队氛围？",
+    "TA 是否能把热情转为可持续的推进力？",
+    "关键节点，TA 是否提升场域张力以推动？",
+    "在低谷期，TA 是否能带出‘再试一次’的意愿？",
+    "面对不公/低效，TA 是否敢于直言？",
+    "TA 是否善用能量高点安排艰难任务？",
+    "TA 是否避免仅凭一时激情做重大决策？",
+    "TA 是否能在冲突中保持尊重而不软弱？",
+    "TA 是否在需要时主动站到台前？",
+    "TA 是否能调动他人参与而非独自喷薄？"
+  ],
+  "水流（灵活）": [
+    "TA 是否能在变化中快速换挡？",
+    "面对新信息，TA 是否愿意更新路线？",
+    "TA 是否能并行尝试多条小路径做验证？",
+    "跨文化/跨时区时，TA 是否能调整沟通策略？",
+    "不确定情境，TA 是否先小步实验后扩张？",
+    "资源突变时，TA 是否能做轻量替代？",
+    "复杂问题，TA 是否能切换不同框架看问题？",
+    "目标不明时，TA 是否能先完成一个可证据的最小闭环？",
+    "TA 是否能在岗位/角色切换中迅速适配？",
+    "遇到卡顿，TA 是否能引入外部变量促成松动？"
+  ],
+  "桥梁（连接）": [
+    "TA 是否能快速建立基本信任？",
+    "跨部门协作时，TA 是否能对齐目标与接口？",
+    "TA 是否能在冲突中充当缓冲与翻译？",
+    "TA 是否能识别关键节点人并建立联系？",
+    "TA 是否能把信息/资源连接成协同效应？",
+    "TA 是否能在团队中营造心理安全？",
+    "对外沟通时，TA 是否能准确表达需求与边界？",
+    "TA 是否能维持合作关系的长期稳定性？",
+    "TA 是否善用网络获得更高效的推进？",
+    "TA 是否能把‘个体目标’汇入‘集体目标’？"
+  ]
+};
+
+// 生成 80 题（顺序：8 结构依次，每维10题）
+const AXIS_ORDER = Object.keys(BANK);
+const ITEMS = [];
+AXIS_ORDER.forEach((axis, ai)=>{
+  BANK[axis].forEach((text, idx)=>{
+    ITEMS.push({ id:`Q${ai+1}-${idx+1}`, axisIndex: ai, axisName: axis, text });
+  });
+});
+
+const box = document.getElementById('qBox');
+ITEMS.forEach((q, i)=>{
+  const el=document.createElement('div'); el.className='q';
+  el.innerHTML = `
+    <div><b>${i+1}. [${q.axisName}]</b> ${q.text}</div>
+    <div class="tf" id="tf_${q.id}" style="margin-top:8px">
+      <button data-v="1">是</button>
+      <button data-v="0" class="on">否</button>
+    </div>
+  `;
+  box.appendChild(el);
+  const tf=el.querySelector('.tf');
+  tf.onclick=(e)=>{
+    if(e.target.tagName!=='BUTTON') return;
+    tf.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
+    e.target.classList.add('on');
+    sync();
+  };
+});
+
+function getAnswerValue(id){
+  const tf=document.getElementById('tf_'+id);
+  const btn=tf.querySelector('button.on');
+  return Number(btn.getAttribute('data-v')); // 1/0
+}
+
+// 结构 8 维统计：每维 10 题取均值 * 100
+function computeStruct8(){
+  const sums = Array(8).fill(0);
+  const cnt  = Array(8).fill(0);
+  ITEMS.forEach(it=>{ sums[it.axisIndex]+=getAnswerValue(it.id); cnt[it.axisIndex]++; });
+  return sums.map((s,i)=> cnt[i]? (s/cnt[i])*100 : 0);
+}
+
+// 生态16：由结构 8 推导（与 Step1 一致的推导函数）
+function ecology16FromStruct(S){
+  const v=i=>S[i];
+  return [
+    (v(7)+v(1))/2,(v(7)+v(3)+v(0))/3,(v(1)+v(4)+v(6))/3,(v(5)+v(7)+v(0))/3,
+    (v(3)+v(0)+v(4))/3,(v(4)+v(6)+v(3))/3,(v(6)+v(2))/2,(v(3)+v(1))/2,
+    (v(2)+v(6))/2,(v(3)+v(2))/2,(v(2)+v(3)+v(0))/3,(v(2)+v(6))/2,
+    (v(5)+v(7))/2,(v(5)+v(1)+v(2))/3,(v(6)+v(7)+v(1))/3,(v(4)+v(1)+v(0))/3
+  ];
+}
+
+const stats = document.getElementById('stats');
+function renderStats(){
+  const S = computeStruct8();
+  stats.innerHTML = AXES.map((a,i)=>{
+    const v=S[i]||0;
+    return `
+      <div style="margin-top:8px"><b>${a}</b></div>
+      <div class='bar'><i style='width:${v.toFixed(0)}%'></i><span class='val'>${v.toFixed(1)}</span></div>
+    `;
+  }).join('');
+}
+
+function sync(){ renderStats(); }
+
+document.getElementById('saveBtn').onclick = ()=>{
+  const S3 = computeStruct8();
+  const E16 = ecology16FromStruct(S3);
+  localStorage.setItem('step3_struct', JSON.stringify(S3));
+  localStorage.setItem('step3_eco16', JSON.stringify(E16));
+  alert('Step3（咨询师纠偏）已保存：结构8 与 生态16 写入本地。');
+};
+
+// 首次渲染
+sync();
+</script>
+</body>
+</html>
+"""

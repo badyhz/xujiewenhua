@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Step 2 · 200 标签（v6n·修复ID唯一）</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--card:#121833;--ink:#e7ecff;--muted:#98a1c0;--brand:#6c8cff;--line:#1c2447}
+*{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,#0b1020,#0e1430);color:var(--ink);font-family:'Noto Sans SC',system-ui}
+.wrap{max-width:1300px;margin:22px auto 80px;padding:14px}
+.h1{font-size:26px;font-weight:700;margin:6px 0 12px}
+.card{background:linear-gradient(180deg,#121833,#0f1733);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.btn{padding:8px 14px;border-radius:8px;background:#6c8cff;color:#fff;margin-right:6px;text-decoration:none;border:1px solid #7a95ff;cursor:pointer}
+.btn.ghost{background:transparent;color:#cbd5ff;border-color:#4056a8}
+.pill{padding:4px 10px;border:1px solid #2a3b7a;border-radius:12px;font-size:12px;color:#c9d4ff}
+.row{display:grid;grid-template-columns: minmax(560px,1fr) 320px; gap:16px; align-items:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.q{padding:14px;border:1px solid #2a3b7a;border-radius:14px;background:#0c1433;transition:transform .08s ease, border-color .2s ease;cursor:pointer;user-select:none}
+.q.active{border-color:#6c8cff;transform:translateY(-1px)}
+.kv{display:flex;justify-content:space-between;align-items:center;color:#a8b3e6;font-size:12px}
+.chips{display:grid;grid-template-columns:1fr;gap:10px}
+.chip{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid #2a3b7a;border-radius:12px;background:#0c1433;cursor:pointer;user-select:none}
+.chip.active{background:#1a244f;border-color:#5a76dd}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+#debug{margin-top:10px;font-size:12px;color:#9fb0ff;white-space:pre-wrap}
+.sticky{position:sticky; top:12px}
+</style></head><body><div class="wrap">
+<div class="h1">Step 2 · 新版 200 个环境标签（v6n）</div>
+<div class="card">
+  <div class="row">
+    <div>
+      <div class="kv"><span>标签选择</span><span id="selMeta" class="pill">已选：0 / 200</span></div>
+      <div id="tagGrid" class="grid"></div>
+    </div>
+    <div class="sticky">
+      <div class="kv" style="margin-bottom:6px"><span>分类（点击切换）</span></div>
+      <div class="chips" id="chips"></div>
+      <div class="meta">
+        <span class="pill" id="catName">当前：全部</span>
+        <button class="btn ghost" id="btnClear">清除全部标签</button>
+        <button class="btn" id="btnSave">保存并前往 Step 3</button>
+        <a class="btn" href="dashboard.html">仅查看 Dashboard</a>
+      </div>
+      <div id="debug" class="card" style="margin-top:12px">debug: 正常 | 唯一ID: 200</div>
+    </div>
+  </div>
+</div>
+<script>
+// Kill duplicate script
+if(!window.__STEP2_V6N_LOADED){ window.__STEP2_V6N_LOADED = true; } else { throw new Error('脚本重复加载被阻止'); }
+
+const TAGS = [{"id": "T001", "category": "行业/职业烙印·行业", "name": "科技创新"}, {"id": "T002", "category": "行业/职业烙印·行业", "name": "金融投资"}, {"id": "T003", "category": "行业/职业烙印·行业", "name": "制造业"}, {"id": "T004", "category": "行业/职业烙印·行业", "name": "教育培训"}, {"id": "T005", "category": "行业/职业烙印·行业", "name": "医疗健康"}, {"id": "T006", "category": "行业/职业烙印·行业", "name": "艺术设计"}, {"id": "T007", "category": "行业/职业烙印·行业", "name": "政府公共"}, {"id": "T008", "category": "行业/职业烙印·行业", "name": "非营利组织"}, {"id": "T009", "category": "行业/职业烙印·行业", "name": "电商零售"}, {"id": "T010", "category": "行业/职业烙印·行业", "name": "体育竞技"}, {"id": "T011", "category": "行业/职业烙印·行业", "name": "媒体传播"}, {"id": "T012", "category": "行业/职业烙印·行业", "name": "法律行业"}, {"id": "T013", "category": "行业/职业烙印·行业", "name": "农业/自然资源"}, {"id": "T014", "category": "行业/职业烙印·行业", "name": "房地产"}, {"id": "T015", "category": "行业/职业烙印·行业", "name": "咨询顾问"}, {"id": "T016", "category": "行业/职业烙印·行业", "name": "娱乐产业"}, {"id": "T017", "category": "行业/职业烙印·行业", "name": "游戏开发"}, {"id": "T018", "category": "行业/职业烙印·行业", "name": "公益慈善"}, {"id": "T019", "category": "行业/职业烙印·行业", "name": "环境保护"}, {"id": "T020", "category": "行业/职业烙印·行业", "name": "创业公司"}, {"id": "T021", "category": "行业/职业烙印·职位", "name": "高层管理"}, {"id": "T022", "category": "行业/职业烙印·职位", "name": "中层主管"}, {"id": "T023", "category": "行业/职业烙印·职位", "name": "项目经理"}, {"id": "T024", "category": "行业/职业烙印·职位", "name": "一线执行"}, {"id": "T025", "category": "行业/职业烙印·职位", "name": "创意岗位"}, {"id": "T026", "category": "行业/职业烙印·职位", "name": "技术研发"}, {"id": "T027", "category": "行业/职业烙印·职位", "name": "销售人员"}, {"id": "T028", "category": "行业/职业烙印·职位", "name": "客服岗位"}, {"id": "T029", "category": "行业/职业烙印·职位", "name": "行政支持"}, {"id": "T030", "category": "行业/职业烙印·职位", "name": "咨询顾问-职位"}, {"id": "T031", "category": "行业/职业烙印·职位", "name": "医生/护士"}, {"id": "T032", "category": "行业/职业烙印·职位", "name": "教师"}, {"id": "T033", "category": "行业/职业烙印·职位", "name": "研究人员"}, {"id": "T034", "category": "行业/职业烙印·职位", "name": "艺术家"}, {"id": "T035", "category": "行业/职业烙印·职位", "name": "工程师"}, {"id": "T036", "category": "行业/职业烙印·职位", "name": "司机/物流"}, {"id": "T037", "category": "行业/职业烙印·职位", "name": "自由职业者"}, {"id": "T038", "category": "行业/职业烙印·职位", "name": "公务员"}, {"id": "T039", "category": "行业/职业烙印·职位", "name": "志愿者"}, {"id": "T040", "category": "行业/职业烙印·职位", "name": "全职父母"}, {"id": "T041", "category": "关键事件/生命节点", "name": "创业失败"}, {"id": "T042", "category": "关键事件/生命节点", "name": "成功创业"}, {"id": "T043", "category": "关键事件/生命节点", "name": "升职"}, {"id": "T044", "category": "关键事件/生命节点", "name": "降职/裁员"}, {"id": "T045", "category": "关键事件/生命节点", "name": "留学经历"}, {"id": "T046", "category": "关键事件/生命节点", "name": "海外工作"}, {"id": "T047", "category": "关键事件/生命节点", "name": "离婚/分手"}, {"id": "T048", "category": "关键事件/生命节点", "name": "结婚"}, {"id": "T049", "category": "关键事件/生命节点", "name": "生育"}, {"id": "T050", "category": "关键事件/生命节点", "name": "父母离世"}, {"id": "T051", "category": "关键事件/生命节点", "name": "长期疾病"}, {"id": "T052", "category": "关键事件/生命节点", "name": "康复/痊愈"}, {"id": "T053", "category": "关键事件/生命节点", "name": "亲密关系破裂"}, {"id": "T054", "category": "关键事件/生命节点", "name": "长期异地"}, {"id": "T055", "category": "关键事件/生命节点", "name": "搬迁换城"}, {"id": "T056", "category": "关键事件/生命节点", "name": "长期旅行"}, {"id": "T057", "category": "关键事件/生命节点", "name": "Gap year"}, {"id": "T058", "category": "关键事件/生命节点", "name": "军事/服役"}, {"id": "T059", "category": "关键事件/生命节点", "name": "灾难经历"}, {"id": "T060", "category": "关键事件/生命节点", "name": "志愿服务"}, {"id": "T061", "category": "关键事件/生命节点", "name": "长期照护责任"}, {"id": "T062", "category": "关键事件/生命节点", "name": "海外移民"}, {"id": "T063", "category": "关键事件/生命节点", "name": "重大升学/考试"}, {"id": "T064", "category": "关键事件/生命节点", "name": "重大项目交付"}, {"id": "T065", "category": "关键事件/生命节点", "name": "家族企业接班"}, {"id": "T066", "category": "关键事件/生命节点", "name": "意外事故"}, {"id": "T067", "category": "关键事件/生命节点", "name": "财务巨变"}, {"id": "T068", "category": "关键事件/生命节点", "name": "创业退出"}, {"id": "T069", "category": "关键事件/生命节点", "name": "成为公众人物"}, {"id": "T070", "category": "关键事件/生命节点", "name": "长期隐居"}, {"id": "T071", "category": "社会阶层/成长背景", "name": "一线城市成长"}, {"id": "T072", "category": "社会阶层/成长背景", "name": "小城镇成长"}, {"id": "T073", "category": "社会阶层/成长背景", "name": "农村成长"}, {"id": "T074", "category": "社会阶层/成长背景", "name": "富裕家庭"}, {"id": "T075", "category": "社会阶层/成长背景", "name": "普通家庭"}, {"id": "T076", "category": "社会阶层/成长背景", "name": "贫困家庭"}, {"id": "T077", "category": "社会阶层/成长背景", "name": "高教育资源"}, {"id": "T078", "category": "社会阶层/成长背景", "name": "教育资源稀缺"}, {"id": "T079", "category": "社会阶层/成长背景", "name": "海外背景"}, {"id": "T080", "category": "社会阶层/成长背景", "name": "单亲家庭"}, {"id": "T081", "category": "社会阶层/成长背景", "name": "多子女家庭"}, {"id": "T082", "category": "社会阶层/成长背景", "name": "独生子女"}, {"id": "T083", "category": "社会阶层/成长背景", "name": "家族企业"}, {"id": "T084", "category": "社会阶层/成长背景", "name": "农业背景"}, {"id": "T085", "category": "社会阶层/成长背景", "name": "蓝领家庭"}, {"id": "T086", "category": "社会阶层/成长背景", "name": "白领家庭"}, {"id": "T087", "category": "社会阶层/成长背景", "name": "知识分子家庭"}, {"id": "T088", "category": "社会阶层/成长背景", "name": "宗教家庭"}, {"id": "T089", "category": "社会阶层/成长背景", "name": "世代城镇居民"}, {"id": "T090", "category": "社会阶层/成长背景", "name": "游牧/迁徙家庭"}, {"id": "T091", "category": "社会阶层/成长背景", "name": "社会跃迁家庭"}, {"id": "T092", "category": "社会阶层/成长背景", "name": "政治家庭"}, {"id": "T093", "category": "社会阶层/成长背景", "name": "艺术家庭"}, {"id": "T094", "category": "社会阶层/成长背景", "name": "工商家庭"}, {"id": "T095", "category": "社会阶层/成长背景", "name": "环保家庭"}, {"id": "T096", "category": "消费与生活印记", "name": "储蓄型"}, {"id": "T097", "category": "消费与生活印记", "name": "投资型"}, {"id": "T098", "category": "消费与生活印记", "name": "奢侈消费"}, {"id": "T099", "category": "消费与生活印记", "name": "极简消费"}, {"id": "T100", "category": "消费与生活印记", "name": "健身投入"}, {"id": "T101", "category": "消费与生活印记", "name": "旅游爱好"}, {"id": "T102", "category": "消费与生活印记", "name": "数码极客"}, {"id": "T103", "category": "消费与生活印记", "name": "文艺消费"}, {"id": "T104", "category": "消费与生活印记", "name": "美食爱好"}, {"id": "T105", "category": "消费与生活印记", "name": "追星"}, {"id": "T106", "category": "消费与生活印记", "name": "高频网购"}, {"id": "T107", "category": "消费与生活印记", "name": "线下购物偏好"}, {"id": "T108", "category": "消费与生活印记", "name": "收藏癖好"}, {"id": "T109", "category": "消费与生活印记", "name": "投机偏好"}, {"id": "T110", "category": "消费与生活印记", "name": "家庭消费导向"}, {"id": "T111", "category": "消费与生活印记", "name": "注重环保消费"}, {"id": "T112", "category": "消费与生活印记", "name": "DIY/手工"}, {"id": "T113", "category": "消费与生活印记", "name": "品牌忠诚度高"}, {"id": "T114", "category": "消费与生活印记", "name": "品牌忠诚度低"}, {"id": "T115", "category": "消费与生活印记", "name": "高频社交消费"}, {"id": "T116", "category": "消费与生活印记", "name": "低消费倾向"}, {"id": "T117", "category": "消费与生活印记", "name": "投入教育消费"}, {"id": "T118", "category": "消费与生活印记", "name": "投入文化消费"}, {"id": "T119", "category": "消费与生活印记", "name": "偏好储蓄理财"}, {"id": "T120", "category": "消费与生活印记", "name": "享乐消费"}, {"id": "T121", "category": "社交指纹", "name": "大圈层社交"}, {"id": "T122", "category": "社交指纹", "name": "小圈层深交"}, {"id": "T123", "category": "社交指纹", "name": "线上高活跃"}, {"id": "T124", "category": "社交指纹", "name": "线下频繁聚会"}, {"id": "T125", "category": "社交指纹", "name": "跨行业社交"}, {"id": "T126", "category": "社交指纹", "name": "单一行业社交"}, {"id": "T127", "category": "社交指纹", "name": "跨文化交往"}, {"id": "T128", "category": "社交指纹", "name": "社交回避"}, {"id": "T129", "category": "社交指纹", "name": "圈层稳定性高"}, {"id": "T130", "category": "社交指纹", "name": "频繁更换圈子"}, {"id": "T131", "category": "社交指纹", "name": "高人脉利用率"}, {"id": "T132", "category": "社交指纹", "name": "低人脉利用率"}, {"id": "T133", "category": "社交指纹", "name": "强社交驱动"}, {"id": "T134", "category": "社交指纹", "name": "弱社交驱动"}, {"id": "T135", "category": "社交指纹", "name": "多代际互动"}, {"id": "T136", "category": "社交指纹", "name": "单代际互动"}, {"id": "T137", "category": "社交指纹", "name": "高密度线上群组"}, {"id": "T138", "category": "社交指纹", "name": "高密度线下聚会"}, {"id": "T139", "category": "社交指纹", "name": "社交频繁换平台"}, {"id": "T140", "category": "社交指纹", "name": "长期固定平台"}, {"id": "T141", "category": "社交指纹", "name": "跨区域社交"}, {"id": "T142", "category": "社交指纹", "name": "专注单一区域"}, {"id": "T143", "category": "社交指纹", "name": "社交伴随消费"}, {"id": "T144", "category": "社交指纹", "name": "社交伴随工作"}, {"id": "T145", "category": "社交指纹", "name": "独立低社交"}, {"id": "T146", "category": "时间分配", "name": "高工作比重"}, {"id": "T147", "category": "时间分配", "name": "高学习比重"}, {"id": "T148", "category": "时间分配", "name": "高家庭时间"}, {"id": "T149", "category": "时间分配", "name": "高社交时间"}, {"id": "T150", "category": "时间分配", "name": "高娱乐时间"}, {"id": "T151", "category": "时间分配", "name": "高运动时间"}, {"id": "T152", "category": "时间分配", "name": "高独处时间"}, {"id": "T153", "category": "时间分配", "name": "高志愿服务"}, {"id": "T154", "category": "时间分配", "name": "高旅行时间"}, {"id": "T155", "category": "时间分配", "name": "工作与生活平衡"}, {"id": "T156", "category": "时间分配", "name": "长期熬夜"}, {"id": "T157", "category": "时间分配", "name": "规律作息"}, {"id": "T158", "category": "时间分配", "name": "短期高强度冲刺"}, {"id": "T159", "category": "时间分配", "name": "长期均衡推进"}, {"id": "T160", "category": "时间分配", "name": "频繁换工作"}, {"id": "T161", "category": "时间分配", "name": "稳定长期任职"}, {"id": "T162", "category": "时间分配", "name": "高娱乐消耗"}, {"id": "T163", "category": "时间分配", "name": "高学习自律"}, {"id": "T164", "category": "时间分配", "name": "长期低效率"}, {"id": "T165", "category": "时间分配", "name": "任务交替频繁"}, {"id": "T166", "category": "时间分配", "name": "长期专注单一目标"}, {"id": "T167", "category": "时间分配", "name": "家庭照护比重大"}, {"id": "T168", "category": "时间分配", "name": "短期项目频繁"}, {"id": "T169", "category": "时间分配", "name": "长期稳定项目"}, {"id": "T170", "category": "时间分配", "name": "多重身份切换"}, {"id": "T171", "category": "身份印记&自我叙事", "name": "奋斗者"}, {"id": "T172", "category": "身份印记&自我叙事", "name": "探索者"}, {"id": "T173", "category": "身份印记&自我叙事", "name": "守护者"}, {"id": "T174", "category": "身份印记&自我叙事", "name": "艺术家-身份"}, {"id": "T175", "category": "身份印记&自我叙事", "name": "连接者"}, {"id": "T176", "category": "身份印记&自我叙事", "name": "规划者"}, {"id": "T177", "category": "身份印记&自我叙事", "name": "独行侠"}, {"id": "T178", "category": "身份印记&自我叙事", "name": "修复者"}, {"id": "T179", "category": "身份印记&自我叙事", "name": "思考者"}, {"id": "T180", "category": "身份印记&自我叙事", "name": "领航者"}, {"id": "T181", "category": "身份印记&自我叙事", "name": "享乐者"}, {"id": "T182", "category": "身份印记&自我叙事", "name": "创业者"}, {"id": "T183", "category": "身份印记&自我叙事", "name": "哲学者"}, {"id": "T184", "category": "身份印记&自我叙事", "name": "照顾者"}, {"id": "T185", "category": "身份印记&自我叙事", "name": "行动派"}, {"id": "T186", "category": "身份印记&自我叙事", "name": "理想主义者"}, {"id": "T187", "category": "身份印记&自我叙事", "name": "实用主义者"}, {"id": "T188", "category": "身份印记&自我叙事", "name": "冒险家"}, {"id": "T189", "category": "身份印记&自我叙事", "name": "保守派"}, {"id": "T190", "category": "身份印记&自我叙事", "name": "社交达人"}, {"id": "T191", "category": "身份印记&自我叙事", "name": "孤独主义者"}, {"id": "T192", "category": "身份印记&自我叙事", "name": "沉默观察者"}, {"id": "T193", "category": "身份印记&自我叙事", "name": "野心家"}, {"id": "T194", "category": "身份印记&自我叙事", "name": "追梦人"}, {"id": "T195", "category": "身份印记&自我叙事", "name": "审慎者"}, {"id": "T196", "category": "身份印记&自我叙事", "name": "矛盾调停者"}, {"id": "T197", "category": "身份印记&自我叙事", "name": "创新颠覆者"}, {"id": "T198", "category": "身份印记&自我叙事", "name": "稳健执行者"}, {"id": "T199", "category": "身份印记&自我叙事", "name": "情绪感染者"}, {"id": "T200", "category": "身份印记&自我叙事", "name": "内心平衡者"}];
+const WEIGHTS = {"T001": {"eco": [[11, 8], [8, 6]], "struct": []}, "T002": {"eco": [[4, 7], [8, 8]], "struct": []}, "T003": {"eco": [[7, 6]], "struct": [[3, 7]]}, "T004": {"eco": [[9, 7]], "struct": [[7, 8]]}, "T005": {"eco": [[2, 8]], "struct": [[1, 7]]}, "T006": {"eco": [[11, 7]], "struct": [[6, 9]]}, "T007": {"eco": [[1, 7]], "struct": [[0, 8]]}, "T008": {"eco": [[15, 6]], "struct": [[7, 7]]}, "T009": {"eco": [[12, 7]], "struct": [[5, 8]]}, "T010": {"eco": [], "struct": [[5, 9], [4, 8]]}, "T011": {"eco": [[12, 8], [3, 7]], "struct": []}, "T012": {"eco": [[8, 8]], "struct": [[3, 7]]}, "T013": {"eco": [[15, 6]], "struct": [[4, 7]]}, "T014": {"eco": [[4, 7], [1, 6]], "struct": []}, "T015": {"eco": [[11, 7]], "struct": [[2, 8]]}, "T016": {"eco": [[12, 9], [2, -5]], "struct": []}, "T017": {"eco": [[11, 8], [5, -6]], "struct": []}, "T018": {"eco": [[15, 7]], "struct": [[7, 8]]}, "T019": {"eco": [[15, 6]], "struct": [[0, 7]]}, "T020": {"eco": [], "struct": [[6, 8], [4, 7]]}, "T021": {"eco": [[3, 9], [3, 8]], "struct": []}, "T022": {"eco": [[1, 7], [5, 6]], "struct": []}, "T023": {"eco": [[7, 8], [5, 7]], "struct": []}, "T024": {"eco": [[7, 9]], "struct": []}, "T025": {"eco": [[11, 9], [11, 6]], "struct": []}, "T026": {"eco": [[10, 8], [8, 7]], "struct": []}, "T027": {"eco": [[12, 8], [0, 7]], "struct": []}, "T028": {"eco": [[2, 6]], "struct": [[7, 8]]}, "T029": {"eco": [[9, 6]], "struct": [[3, 7]]}, "T030": {"eco": [[8, 8], [9, 6]], "struct": []}, "T031": {"eco": [[2, 7]], "struct": [[1, 8]]}, "T032": {"eco": [[9, 7]], "struct": [[7, 7]]}, "T033": {"eco": [[5, 7]], "struct": [[2, 8]]}, "T034": {"eco": [[11, 9], [12, 6]], "struct": []}, "T035": {"eco": [[10, 7]], "struct": [[3, 8]]}, "T036": {"eco": [[5, 7], [4, 6]], "struct": []}, "T037": {"eco": [[4, 8], [14, 7]], "struct": []}, "T038": {"eco": [[1, 7]], "struct": [[0, 7]]}, "T039": {"eco": [[15, 8], [1, 6]], "struct": []}, "T040": {"eco": [[2, 8], [15, 7]], "struct": []}, "T041": {"eco": [[2, 7], [15, -6]], "struct": [[4, 9]]}, "T042": {"eco": [[4, 7]], "struct": [[5, 8]]}, "T043": {"eco": [[3, 8], [4, 6]], "struct": []}, "T044": {"eco": [[15, -6]], "struct": [[4, 8]]}, "T045": {"eco": [[14, 7]], "struct": [[6, 8]]}, "T046": {"eco": [[14, 9]], "struct": [[2, 6]]}, "T047": {"eco": [[2, -7]], "struct": [[6, 6]]}, "T048": {"eco": [[2, 8], [15, 6]], "struct": []}, "T049": {"eco": [[2, 8]], "struct": [[1, 6]]}, "T050": {"eco": [], "struct": [[2, 8], [1, 7]]}, "T051": {"eco": [[15, -7]], "struct": [[4, 9]]}, "T052": {"eco": [[15, 6]], "struct": [[1, 8]]}, "T053": {"eco": [[15, -8], [2, -6]], "struct": []}, "T054": {"eco": [[4, 7], [2, -6]], "struct": []}, "T055": {"eco": [[14, 8], [2, -5]], "struct": []}, "T056": {"eco": [[15, 6]], "struct": [[6, 8]]}, "T057": {"eco": [[4, 6]], "struct": [[6, 7]]}, "T058": {"eco": [], "struct": [[4, 8], [3, 7]]}, "T059": {"eco": [[2, 8]], "struct": [[1, 9]]}, "T060": {"eco": [[15, 8], [1, 7]], "struct": []}, "T061": {"eco": [[15, 6]], "struct": [[4, 8]]}, "T062": {"eco": [[14, 9], [2, -6]], "struct": []}, "T063": {"eco": [[5, 7]], "struct": [[3, 8]]}, "T064": {"eco": [[7, 9]], "struct": [[5, 6]]}, "T065": {"eco": [[4, 7]], "struct": [[0, 8]]}, "T066": {"eco": [[15, -7]], "struct": [[1, 8]]}, "T067": {"eco": [[8, 9], [15, 7]], "struct": []}, "T068": {"eco": [[15, 6]], "struct": [[6, 7]]}, "T069": {"eco": [[3, 9], [12, 8]], "struct": []}, "T070": {"eco": [[4, 9], [2, -7]], "struct": []}, "T071": {"eco": [[3, 6]], "struct": [[2, 7]]}, "T072": {"eco": [[2, 6]], "struct": [[4, 7]]}, "T073": {"eco": [[15, 6]], "struct": [[4, 8]]}, "T074": {"eco": [[12, 8], [15, 7]], "struct": []}, "T075": {"eco": [[4, 7]], "struct": [[4, 6]]}, "T076": {"eco": [[15, -6]], "struct": [[4, 9]]}, "T077": {"eco": [[5, 8], [8, 7]], "struct": []}, "T078": {"eco": [[4, 7], [2, 6]], "struct": []}, "T079": {"eco": [[14, 9], [3, 7]], "struct": []}, "T080": {"eco": [[4, 7], [2, -6]], "struct": []}, "T081": {"eco": [[1, 8], [2, 7]], "struct": []}, "T082": {"eco": [[4, 8], [2, -5]], "struct": []}, "T083": {"eco": [[1, 7]], "struct": [[3, 7]]}, "T084": {"eco": [[5, 6]], "struct": [[4, 7]]}, "T085": {"eco": [[7, 8], [4, 6]], "struct": []}, "T086": {"eco": [], "struct": [[2, 7], [7, 6]]}, "T087": {"eco": [[5, 7]], "struct": [[2, 8]]}, "T088": {"eco": [[2, 6]], "struct": [[0, 8]]}, "T089": {"eco": [[2, 8], [2, 7]], "struct": []}, "T090": {"eco": [[14, 9], [2, -6]], "struct": []}, "T091": {"eco": [[15, 6]], "struct": [[6, 8]]}, "T092": {"eco": [[3, 8], [3, 7]], "struct": []}, "T093": {"eco": [[11, 8], [12, 7]], "struct": []}, "T094": {"eco": [[4, 6]], "struct": [[3, 7]]}, "T095": {"eco": [[15, 6]], "struct": [[0, 7]]}, "T096": {"eco": [[7, 8], [15, 6]], "struct": []}, "T097": {"eco": [[8, 8], [4, 7]], "struct": []}, "T098": {"eco": [[12, 9], [15, -6]], "struct": []}, "T099": {"eco": [[4, 7], [15, 7]], "struct": []}, "T100": {"eco": [[5, 8]], "struct": [[1, 7]]}, "T101": {"eco": [[14, 7]], "struct": [[6, 8]]}, "T102": {"eco": [[11, 8], [10, 7]], "struct": []}, "T103": {"eco": [[11, 7], [15, 6]], "struct": []}, "T104": {"eco": [[15, 7], [12, 6]], "struct": []}, "T105": {"eco": [[12, 8], [2, -5]], "struct": []}, "T106": {"eco": [[5, -5]], "struct": [[6, 7]]}, "T107": {"eco": [[2, 6], [7, 6]], "struct": []}, "T108": {"eco": [[15, 6]], "struct": [[2, 7]]}, "T109": {"eco": [[8, 9], [15, -5]], "struct": []}, "T110": {"eco": [[15, 8], [2, 6]], "struct": []}, "T111": {"eco": [[15, 6]], "struct": [[0, 7]]}, "T112": {"eco": [[11, 8], [7, 6]], "struct": []}, "T113": {"eco": [[2, 6], [2, 6]], "struct": []}, "T114": {"eco": [[15, -5]], "struct": [[6, 7]]}, "T115": {"eco": [[12, 6]], "struct": [[7, 7]]}, "T116": {"eco": [[4, 7], [15, 6]], "struct": []}, "T117": {"eco": [[5, 8]], "struct": [[2, 6]]}, "T118": {"eco": [[11, 7], [15, 6]], "struct": []}, "T119": {"eco": [[15, 6]], "struct": [[3, 7]]}, "T120": {"eco": [[12, 8], [15, -6]], "struct": []}, "T121": {"eco": [[12, 8], [3, 7]], "struct": []}, "T122": {"eco": [[2, 8], [15, 7]], "struct": []}, "T123": {"eco": [[12, 7], [10, 6]], "struct": []}, "T124": {"eco": [[1, 8], [12, 6]], "struct": []}, "T125": {"eco": [[11, 7], [10, 6]], "struct": []}, "T126": {"eco": [[7, 7], [4, 6]], "struct": []}, "T127": {"eco": [[14, 7]], "struct": [[6, 8]]}, "T128": {"eco": [[4, 8], [2, -6]], "struct": []}, "T129": {"eco": [[2, 7], [15, 6]], "struct": []}, "T130": {"eco": [[14, 7], [2, -5]], "struct": []}, "T131": {"eco": [[1, 7], [4, 6]], "struct": []}, "T132": {"eco": [[15, 6], [12, -5]], "struct": []}, "T133": {"eco": [[12, 6]], "struct": [[5, 8]]}, "T134": {"eco": [[4, 8], [2, -6]], "struct": []}, "T135": {"eco": [[2, 7], [15, 6]], "struct": []}, "T136": {"eco": [[2, -5]], "struct": [[7, 6]]}, "T137": {"eco": [[12, 7], [10, 6]], "struct": []}, "T138": {"eco": [[1, 7], [12, 6]], "struct": []}, "T139": {"eco": [[15, -5]], "struct": [[6, 7]]}, "T140": {"eco": [[2, 6], [2, 6]], "struct": []}, "T141": {"eco": [[14, 8]], "struct": [[7, 6]]}, "T142": {"eco": [[7, 7], [2, 6]], "struct": []}, "T143": {"eco": [[12, 7], [15, 6]], "struct": []}, "T144": {"eco": [[1, 7], [4, 6]], "struct": []}, "T145": {"eco": [[4, 8], [2, -6]], "struct": []}, "T146": {"eco": [[4, 9], [5, -6]], "struct": []}, "T147": {"eco": [[5, 8], [10, 7]], "struct": []}, "T148": {"eco": [[2, 8], [15, 8]], "struct": []}, "T149": {"eco": [[12, 6]], "struct": [[7, 8]]}, "T150": {"eco": [[11, 6]], "struct": [[6, 7]]}, "T151": {"eco": [], "struct": [[5, 8], [1, 7]]}, "T152": {"eco": [[2, -6]], "struct": [[2, 8]]}, "T153": {"eco": [[15, 8], [1, 7]], "struct": []}, "T154": {"eco": [[14, 7]], "struct": [[6, 8]]}, "T155": {"eco": [[15, 7], [5, 7]], "struct": []}, "T156": {"eco": [[5, -7]], "struct": [[1, -6]]}, "T157": {"eco": [[5, 8], [15, 7]], "struct": []}, "T158": {"eco": [], "struct": [[5, 8], [4, 6]]}, "T159": {"eco": [[5, 7]], "struct": [[4, 8]]}, "T160": {"eco": [[2, -6]], "struct": [[6, 7]]}, "T161": {"eco": [[7, 7]], "struct": [[4, 8]]}, "T162": {"eco": [[12, 7], [15, -6]], "struct": []}, "T163": {"eco": [[5, 7]], "struct": [[3, 8]]}, "T164": {"eco": [[5, -7], [4, -6]], "struct": []}, "T165": {"eco": [[7, -5]], "struct": [[6, 7]]}, "T166": {"eco": [[15, 6]], "struct": [[4, 8]]}, "T167": {"eco": [[2, 8]], "struct": [[1, 7]]}, "T168": {"eco": [[5, -5]], "struct": [[6, 7]]}, "T169": {"eco": [[7, 7]], "struct": [[3, 8]]}, "T170": {"eco": [[15, -5]], "struct": [[6, 7]]}, "T171": {"eco": [[4, 9]], "struct": [[4, 8]]}, "T172": {"eco": [[8, 7]], "struct": [[6, 8]]}, "T173": {"eco": [[2, 8]], "struct": [[1, 8]]}, "T174": {"eco": [[11, 9], [12, 7]], "struct": []}, "T175": {"eco": [[1, 8]], "struct": [[7, 9]]}, "T176": {"eco": [[9, 7]], "struct": [[3, 8]]}, "T177": {"eco": [[4, 8], [15, -6]], "struct": []}, "T178": {"eco": [[2, 9], [15, 7]], "struct": []}, "T179": {"eco": [[10, 7]], "struct": [[2, 9]]}, "T180": {"eco": [[3, 8]], "struct": [[0, 9]]}, "T181": {"eco": [[12, 8], [15, -6]], "struct": []}, "T182": {"eco": [], "struct": [[6, 8], [4, 8]]}, "T183": {"eco": [[15, 7]], "struct": [[2, 8]]}, "T184": {"eco": [[2, 8]], "struct": [[1, 8]]}, "T185": {"eco": [[7, 7]], "struct": [[5, 9]]}, "T186": {"eco": [[11, 7]], "struct": [[0, 8]]}, "T187": {"eco": [[7, 7]], "struct": [[3, 8]]}, "T188": {"eco": [[8, -6]], "struct": [[6, 9]]}, "T189": {"eco": [], "struct": [[1, 8], [6, -7]]}, "T190": {"eco": [[12, 8]], "struct": [[7, 9]]}, "T191": {"eco": [[4, 9], [2, -7]], "struct": []}, "T192": {"eco": [[12, -6]], "struct": [[2, 8]]}, "T193": {"eco": [[4, 9], [3, 8]], "struct": []}, "T194": {"eco": [[15, 7]], "struct": [[6, 8]]}, "T195": {"eco": [[8, 9]], "struct": [[6, -6]]}, "T196": {"eco": [[13, 8], [2, 7]], "struct": []}, "T197": {"eco": [[11, 9], [5, -6]], "struct": []}, "T198": {"eco": [[7, 8]], "struct": [[3, 9]]}, "T199": {"eco": [[12, 9], [12, 8]], "struct": []}, "T200": {"eco": [[15, 8]], "struct": [[1, 9]]}};
+const ECO2AX = {0:7,1:7,2:4,3:5,4:3,5:4,6:6,7:3,8:2,9:2,10:2,11:6,12:5,13:1,14:6,15:4};
+
+const PARENTS = [
+ ["全部", ["*"]],
+ ["行业", ["行业/职业烙印·行业"]],
+ ["职位类型", ["行业/职业烙印·职位"]],
+ ["关键事件/生命节点", ["关键事件/生命节点"]],
+ ["成长背景", ["社会阶层/成长背景"]],
+ ["消费与生活印记", ["消费与生活印记"]],
+ ["社交指纹", ["社交指纹"]],
+ ["时间分配", ["时间分配"]],
+ ["身份印记/自我叙事", ["身份印记&自我叙事"]],
+];
+
+// New storage keys to avoid legacy polluted data
+const KEY_SEL = 'step2_selected_v6n';
+const KEY_CAT = 'step2_activeCat_v6n';
+
+function sanitizeSelected(raw){
+  try{
+    const arr = Array.isArray(raw) ? raw : [];
+    const valid = new Set(TAGS.map(t=>t.id));
+    const uniq = Array.from(new Set(arr)).filter(id => typeof id==='string' && valid.has(id));
+    return uniq;
+  }catch(e){ return []; }
+}
+let selected = new Set(sanitizeSelected(JSON.parse(localStorage.getItem(KEY_SEL)||'[]')));
+let parentActive = localStorage.getItem(KEY_CAT) || '全部';
+
+// UI renderers
+const chips = document.getElementById('chips');
+function renderChips(){
+  chips.innerHTML = PARENTS.map(([name,_])=>`<div class="chip ${name===parentActive?'active':''}" data-k="${name}"><b>${name}</b><span>›</span></div>`).join('');
+}
+renderChips();
+chips.addEventListener('click', (e)=>{
+  const el = e.target.closest('.chip'); if(!el) return;
+  e.preventDefault(); e.stopPropagation();
+  parentActive = el.getAttribute('data-k');
+  localStorage.setItem(KEY_CAT, parentActive);
+  document.getElementById('catName').textContent='当前：'+parentActive;
+  renderChips(); renderGrid();
+});
+
+const grid = document.getElementById('tagGrid');
+function inParent(tag){
+  if(parentActive==='全部') return true;
+  const map = new Map(PARENTS);
+  const arr = map.get(parentActive) || [];
+  return arr.includes(tag.category);
+}
+function cardHTML(t){
+  const act = selected.has(t.id) ? 'active' : '';
+  return `<div class="q ${act}" data-id="${t.id}">
+    <div style="display:flex;justify-content:space-between;align-items:center"><b>${t.name}</b><span class='pill'>${t.id}</span></div>
+    <div style='color:#9fb0ff;font-size:12px;margin-top:6px'>${t.category}</div>
+  </div>`;
+}
+function renderGrid(){
+  const list = TAGS.filter(inParent);
+  grid.innerHTML = list.map(cardHTML).join('');
+}
+renderGrid();
+
+// toggle
+let toggleLock = false;
+grid.addEventListener('click', (e)=>{
+  if(toggleLock) return;
+  const card = e.target.closest('.q'); if(!card || !grid.contains(card)) return;
+  e.preventDefault(); e.stopPropagation();
+  try{
+    toggleLock = true;
+    const id = card.getAttribute('data-id');
+    if(selected.has(id)) selected.delete(id); else selected.add(id);
+    localStorage.setItem(KEY_SEL, JSON.stringify(Array.from(selected)));
+    card.classList.toggle('active');
+    updateSel();
+  } finally {
+    setTimeout(()=>{ toggleLock=false; }, 0);
+  }
+}, {capture:false, passive:false});
+
+document.getElementById('btnClear').addEventListener('click', (e)=>{
+  e.preventDefault(); e.stopPropagation();
+  selected = new Set();
+  localStorage.setItem(KEY_SEL, '[]');
+  renderGrid(); updateSel();
+});
+
+function updateSel(){
+  const n = selected.size|0;
+  document.getElementById('selMeta').textContent = '已选：'+ n +' / 200';
+}
+updateSel();
+
+// Save -> compute and persist for subsequent steps
+function computeAggregates(){
+  const s8 = Array(8).fill(0);
+  const e16 = Array(16).fill(0);
+  const ids = new Set(selected);
+  TAGS.forEach(t=>{
+    if(!ids.has(t.id)) return;
+    const w = WEIGHTS[t.id] || {eco:[], struct:[]};
+    (w.struct||[]).forEach(([ai, dv])=> s8[ai]+=dv );
+    (w.eco||[]).forEach(([ei, dv])=> e16[ei]+=dv );
+  });
+  const s_fromEco = Array(8).fill(0);
+  for(let i=0;i<16;i++){ s_fromEco[ECO2AX[i]] += e16[i]; }
+  const s8Total = s8.map((v,i)=> v + s_fromEco[i]);
+  return {s8Total, e16};
+}
+
+document.getElementById('btnSave').addEventListener('click', (e)=>{
+  e.preventDefault(); e.stopPropagation();
+  const agg = computeAggregates();
+  localStorage.setItem('step2_struct_raw', JSON.stringify(agg.s8Total));
+  localStorage.setItem('step2_eco16_raw', JSON.stringify(agg.e16));
+  alert('Step2 已保存');
+  try{ window.location.href='step3.html'; }catch(err){}
+});
+
+window.onerror = function(msg, src, line, col, err){ 
+  document.getElementById('debug').textContent = 'JS错误: '+msg+' @'+line+':'+col; 
+};
+</script>
+</div></body></html>

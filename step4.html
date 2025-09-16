@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Step4 · 基础14维标签 + 权重预设与综合指数</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1020;--card:#121833;--ink:#e7ecff;--muted:#98a1c0;--line:#1c2447;--hl:#2a3b7a;--ok:#34d399;--warn:#f59b0a;--bad:#ff5c9a;--pri:#6c8cff}
+*{box-sizing:border-box}html,body{margin:0;background:linear-gradient(180deg,#0b1020,#0e1430);color:var(--ink);font-family:'Noto Sans SC',system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+.wrap{max-width:1200px;margin:20px auto 80px;padding:14px}
+.h1{font-size:24px;font-weight:700;margin:4px 0 10px}
+.card{background:linear-gradient(180deg,#121833,#0f1733);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:1024px){.row{grid-template-columns:1fr}}
+h3{margin:0 0 8px;font-size:16px}
+h4{margin:8px 0 6px;font-size:13px;color:#cdd6ff}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;margin:6px 0;font-size:12px;color:#dbe3ff}
+.small{font-size:12px;color:#a8b7ff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid #2a3b7a;border-radius:999px;background:#0c1433;color:#dbe3ff;font-size:12px;cursor:pointer;user-select:none}
+.chip.active{border-color:#7a95ff;background:rgba(108,140,255,.12)}
+.segment{display:inline-flex;border:1px solid #2a3b7a;border-radius:10px;overflow:hidden}
+.segment button{background:#0c1433;color:#cfe0ff;border:0;padding:6px 10px;cursor:pointer;font-size:12px}
+.segment button.active{background:#1a244f;color:#e7efff}
+.badge{display:inline-flex;align-items:center;gap:6px;border:1px solid #2a3b7a;border-radius:999px;padding:2px 8px;font-size:11px;color:#cfe0ff}
+.badge .dot{width:6px;height:6px;border-radius:50%;background:#7a95ff}
+.badge.ok{border-color:rgba(52,211,153,.6);color:#d8fff1}.badge.ok .dot{background:var(--ok)}
+.badge.warn{border-color:rgba(245,158,11,.6);color:#ffe4b8}.badge.warn .dot{background:var(--warn)}
+.badge.bad{border-color:rgba(255,92,154,.6);color:#ffd0e1}.badge.bad .dot{background:var(--bad)}
+.hr{height:1px;background:#243163;margin:10px 0;border:0}
+.btn{padding:8px 12px;border-radius:8px;background:var(--pri);border:1px solid #7a95ff;color:#fff;text-decoration:none;cursor:pointer}
+.btn.ghost{background:#0c1433;color:#cfe0ff;border-color:#3a4a8f}
+.flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.right{display:flex;gap:8px;align-items:center}
+.score{font-size:12px;color:#cfe0ff}
+.value{font-weight:700;color:#e7efff}
+.tip{font-size:12px;color:#a8b7ff;margin-top:4px}
+.table{width:100%;border-collapse:separate;border-spacing:0 6px;margin-top:8px}
+.table th,.table td{font-size:12px;color:#dbe3ff;text-align:left;padding:6px 8px;background:#0b1430;border:1px solid #283766}
+.table th{background:#0f1b3d;color:#e7efff}
+.note{font-size:12px;color:#9fb1ff}
+.select{background:#0c1433;border:1px solid #2a3b7a;border-radius:8px;color:#e7efff;padding:6px 10px;font-size:12px}
+.wtbl{width:100%;border-collapse:separate;border-spacing:0 6px}
+.wtbl th,.wtbl td{font-size:12px;color:#dbe3ff;text-align:left;padding:6px 8px;background:#0b1430;border:1px solid #283766}
+.wtbl th{background:#0f1b3d;color:#e7efff}
+.big{font-size:28px;font-weight:800;letter-spacing:0.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="flex" style="justify-content:space-between">
+    <div class="h1">Step4 · 基础14维标签（点击即选，实时计算）</div>
+    <div class="flex">
+      <a class="btn ghost" href="dashboard.html">← 返回 Dashboard</a>
+      <button class="btn" id="btnSave">保存（本地）</button>
+      <button class="btn ghost" id="btnClear">清空选择</button>
+    </div>
+  </div>
+  <div class="note">
+    说明：本页不改变雷达与排版，仅用于补充 <b>思维 / 逻辑能力 / 熵增 / 洞察</b> + <b>10个更底层维度</b> 的标签判定与提示；并计算 <b>综合指数</b>（权重可一键切换预设）。<br/>
+    分数口径：频率=从不/偶尔/常态 → 30/60/85；方向=偏少/适中/偏多 → -10/0/-5；标签加分≤+15；熵增使用“噪声−护栏”的净效。
+  </div>
+
+  <!-- 顶部：权重与综合指数 -->
+  <div class="card">
+    <div class="flex" style="justify-content:space-between;align-items:flex-start">
+      <div>
+        <h3>综合指数 & 权重预设</h3>
+        <div class="small">综合指数 = 加权平均 − 兜底惩罚；兜底维度：逻辑能力/洞察能力/注意力控制/工作带宽/熵增。</div>
+      </div>
+      <div class="flex">
+        <label class="small">权重预设：</label>
+        <select id="presetSel" class="select">
+          <option value="general">通用（默认）</option>
+          <option value="startup">创业 0→1</option>
+          <option value="scale">扩张 1→10</option>
+          <option value="research">研发/产品深思</option>
+          <option value="wellbeing">生活恢复/韧性</option>
+        </select>
+        <button class="btn ghost" id="btnWeightsReset">重置为预设</button>
+      </div>
+    </div>
+
+    <div class="hr"></div>
+    <div class="flex" style="justify-content:space-between;align-items:center;flex-wrap:wrap">
+      <div class="flex" style="gap:16px;align-items:center">
+        <div class="big" id="compVal">—</div>
+        <span class="badge" id="compBand"><i class="dot"></i>—</span>
+        <div class="small" id="penaltyText">兜底惩罚：—</div>
+      </div>
+      <div class="small">当前预设将保存在 <code>step4_weights</code>，综合指数存为 <code>step4_composite</code>。</div>
+    </div>
+
+    <table class="wtbl" id="wTable" style="margin-top:8px">
+      <thead><tr><th style="width:34px">#</th><th>维度</th><th style="width:120px">权重（%）</th><th style="width:90px">分数</th></tr></thead>
+      <tbody></tbody>
+      <tfoot><tr><td colspan="2" style="text-align:right"><b>合计</b></td><td id="wSum">100%</td><td id="weightedAvg">—</td></tr></tfoot>
+    </table>
+  </div>
+
+  <!-- 概览：生态提示 -->
+  <div class="card" id="summary">
+    <h3>生态联动提示（仅提示，不改分）</h3>
+    <table class="table" id="ecoHintsTable">
+      <thead><tr><th style="width:160px">生态维度</th><th>提示（Δ 为建议方向强度）</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- 维度编辑区 -->
+  <div class="row" id="panel"></div>
+</div>
+
+<script>
+/** ========= 基础数据 ========= */
+const ECO16 = [
+  "信任速度","协作质量","关系韧性","影响半径","目标推进力","节奏管理",
+  "应变效率","落地闭环度","洞察敏锐度","表达条理度","信息整合度","改进驱动力",
+  "能量外放","冲突风格","环境贴合度","幸福感基础"
+];
+const ECO_INDEX = {}; ECO16.forEach((n,i)=>ECO_INDEX[n]=i);
+
+// 14 维顺序（用于 step4_scores）
+const DIMENSIONS = [
+  // 10 个更底层维度
+  { key:"focus", name:"注意力控制（Selective Focus）",
+    desc:"在噪声中稳定选择与保持注意、必要时有代价地切换。",
+    tags:[
+      "能在干扰下保持专注",
+      "不容易被手机/消息打断",
+      "切换任务后能很快进入状态",
+      "专注时间能超过30分钟",
+      "开会时能全程跟上",
+      "做无聊任务也能坚持到结束"
+    ],
+    ecoLinks:{"落地闭环度":0.60,"节奏管理":0.40,"信息整合度":0.30}
+  },
+  { key:"wm", name:"工作带宽（Working Memory & Load）",
+    desc:"承载并操作信息的“心智缓存”与负荷管理。",
+    tags:[
+      "同时处理多任务不容易崩溃",
+      "任务多时还能保持清晰排序",
+      "工作过量时不会明显出错",
+      "能清楚拒绝或推迟额外任务",
+      "下班前能完成计划内任务",
+      "长期高压下还能保持状态"
+    ],
+    ecoLinks:{"表达条理度":0.60,"信息整合度":0.60,"目标推进力":0.30}
+  },
+  { key:"learn", name:"学习与迁移（Learning）",
+    desc:"从经验中抽取结构，跨域迁移到新问题并快速试错。",
+    tags:[
+      "新知识能很快应用到实际工作",
+      "遇到新问题能联想到旧经验",
+      "学到的技能能跨场景使用",
+      "喜欢探索不熟悉的主题",
+      "学过一次的内容记得牢",
+      "总结后能用自己的话讲出来"
+    ],
+    ecoLinks:{"洞察敏锐度":0.40,"改进驱动力":0.50,"落地闭环度":0.20}
+  },
+  { key:"affect", name:"情绪调节与生理自控（Affect & Interoception）",
+    desc:"觉察与调节生理/情绪唤醒水平，使之服务于目标。",
+    tags:[
+      "紧张时能用呼吸或动作放松自己",
+      "情绪高涨时不会失控发火",
+      "面对批评能冷静回应",
+      "生气后能在一小时内恢复",
+      "能控制饮食与作息规律",
+      "感到焦虑时能找到安抚方式"
+    ],
+    ecoLinks:{"幸福感基础":0.60,"关系韧性":0.40,"节奏管理":0.30}
+  },
+  { key:"boundary", name:"边界与主权（Boundaries & Agency）",
+    desc:"明确边界与可用性，主动主张资源与顺序。",
+    tags:[
+      "能清楚说“不”而不愧疚",
+      "不会被他人轻易干扰决策",
+      "面对不合理要求能拒绝",
+      "维护隐私时很坚定",
+      "在关系里坚持自己的底线",
+      "不会为了合群牺牲自我需求"
+    ],
+    ecoLinks:{"协作质量":0.50,"幸福感基础":0.30,"环境贴合度":0.40}
+  },
+  { key:"uncertainty", name:"不确定性承载（Uncertainty Tolerance）",
+    desc:"在信息不全下稳健行动，并设计可逆试错。",
+    tags:[
+      "面对未知不会过度焦虑",
+      "在模糊目标下还能行动",
+      "新环境中不会僵住",
+      "愿意尝试没做过的工作",
+      "接受“没有完美答案”",
+      "出现意外时能快速恢复心态"
+    ],
+    ecoLinks:{"目标推进力":0.30,"改进驱动力":0.50,"应变效率":0.50}
+  },
+  { key:"calibration", name:"现实校准（Calibration）",
+    desc:"自信与准确度匹配，基于证据持续矫正。",
+    tags:[
+      "能分辨想法与现实的差别",
+      "做决策前会先验证信息",
+      "不轻易被情绪左右判断",
+      "听到负面消息会多方确认",
+      "知道自己能力的边界",
+      "会根据反馈调整计划"
+    ],
+    ecoLinks:{"信息整合度":0.50,"表达条理度":0.40,"信任速度":0.30}
+  },
+  { key:"habit", name:"习惯与自动化（Habit Loop & Autopilot）",
+    desc:"把关键行为固化为低摩擦的可重复流程。",
+    tags:[
+      "有固定的早晚习惯",
+      "做事不需要时时提醒",
+      "日常事务能自动完成",
+      "时间管理工具能坚持使用",
+      "能保持规律的运动与饮食",
+      "不会因为小事频繁中断"
+    ],
+    ecoLinks:{"落地闭环度":0.60,"节奏管理":0.50,"关系韧性":0.20}
+  },
+  { key:"social", name:"关系心智（Social Cognition & Empathy）",
+    desc:"理解他人心智与情境规则，降低误读与对立。",
+    tags:[
+      "能站在他人角度理解想法",
+      "对他人情绪很敏感",
+      "能记住对方的重要小细节",
+      "交流时能捕捉未说出口的意思",
+      "愿意主动照顾别人感受",
+      "不容易长期误解他人动机",
+      "团队里能带动节奏与分工",
+      "出现冲突时能主动降级并修复"
+    ],
+    ecoLinks:{"协作质量":0.60,"关系韧性":0.40,"信任速度":0.40}
+  },
+  { key:"meaning", name:"自我叙事与意义（Narrative & Meaning）",
+    desc:"把经历组织成支持行动的叙事，维持意义感。",
+    tags:[
+      "能讲清自己是谁、重视什么",
+      "经常思考人生目标",
+      "有一套自己认可的价值观",
+      "会把经历总结成故事",
+      "面对挫折能找到意义",
+      "会把小成功当作动力"
+    ],
+    ecoLinks:{"幸福感基础":0.60,"影响半径":0.30,"改进驱动力":0.30}
+  },
+
+  // 必备 4 维
+  { key:"thinking", name:"思维（Thinking Modes）",
+    desc:"问题建模与切换的方式栈。",
+    tags:[
+      "能跳出惯性思路看问题",
+      "能提出多个不同的解决方案",
+      "喜欢追问事情背后的“为什么”",
+      "遇到问题能快速分类整理",
+      "善于发现模式与相似点",
+      "能在抽象与细节之间切换"
+    ],
+    ecoLinks:{"信息整合度":0.40,"洞察敏锐度":0.40,"表达条理度":0.30}
+  },
+  { key:"logic", name:"逻辑能力（Logic Skill）",
+    desc:"论证与决策的可验证结构化能力。",
+    tags:[
+      "能清楚解释自己的推理过程",
+      "能指出他人论点的漏洞",
+      "做决定前会权衡利弊",
+      "不容易被片面信息误导",
+      "推理过程能自圆其说",
+      "能把复杂问题拆成小步骤",
+      "会给结论配上证据与边界条件",
+      "能用图表或结构化表达支撑观点",
+      "能标注风险与不确定性"
+    ],
+    ecoLinks:{"表达条理度":0.50,"信息整合度":0.50,"目标推进力":0.30}
+  },
+  { key:"entropy", name:"熵增（Noise & Guardrails）",
+    desc:"噪声来源与低熵护栏并存（本页以“熵管理”健康度计分）。",
+    /* 为保持现有“护栏前缀”加分逻辑，保留正/负向标签写法 */
+    tags:[
+      "需求频繁变更","接口人不清","目标多版本","临时插单","排期漂移","会议过载","跨部门拉扯","返工>30%",
+      "文档失配","缺验收标准","Bug漏测","优先级打架","临时改向","数据口径变动","角色冲突","情绪外溢",
+      "（低熵护栏）标准化模板","（低熵护栏）单一负责人","（低熵护栏）冻结窗","（低熵护栏）变更评审",
+      "（低熵护栏）WIP限流","（低熵护栏）看板透明","（低熵护栏）里程碑准入","（低熵护栏）复盘模板",
+      "（低熵护栏）异常告警","（低熵护栏）SLA协议","（低熵护栏）接口清单","（低熵护栏）灰度/回滚点"
+    ],
+    ecoLinks:{"节奏管理":0.50,"落地闭环度":0.50,"协作质量":0.40}
+  },
+  { key:"insight", name:"洞察能力（Insight）",
+    desc:"识别关键变量与领先指标、生成可检验假设。",
+    tags:[
+      "能敏锐发现潜在问题",
+      "能预见趋势或结果",
+      "对他人说话能抓住重点",
+      "善于提出深层问题",
+      "面对复杂情况能迅速抓住核心",
+      "直觉往往是对的并可被验证",
+      "会设置领先指标并跟踪异常",
+      "能用对照样本或影子数据验证想法"
+    ],
+    ecoLinks:{"洞察敏锐度":0.60,"信息整合度":0.30,"目标推进力":0.20}
+  }
+];
+
+// 分值口径（保持不变）
+const BASE_SCORE = { "从不":30, "偶尔":60, "常态":85 };
+const DIR_ADJ    = { "偏少":-10, "适中":0,  "偏多":-5 };
+const MAX_TAG_BONUS = 15; // 标签最多加 15 分
+
+/** ========= 权重预设 ========= */
+const K = DIMENSIONS.reduce((m,d)=>{ m[d.key]=d; return m; }, {});
+const PRESETS = {
+  general: { name:"通用",
+    w:{ logic:0.12, insight:0.12, entropy:0.10, wm:0.10, focus:0.10,
+        uncertainty:0.08, thinking:0.08, learn:0.07, habit:0.05,
+        boundary:0.05, social:0.05, affect:0.04, calibration:0.02, meaning:0.02 } },
+  startup: { name:"创业 0→1",
+    w:{ insight:0.14, logic:0.12, uncertainty:0.12, learn:0.10, entropy:0.10,
+        focus:0.08, wm:0.08, thinking:0.08, boundary:0.05, social:0.05,
+        habit:0.04, affect:0.02, calibration:0.01, meaning:0.01 } },
+  scale: { name:"扩张 1→10",
+    w:{ entropy:0.12, social:0.10, boundary:0.08, habit:0.08, wm:0.10,
+        focus:0.08, logic:0.10, insight:0.10, thinking:0.06, learn:0.06,
+        uncertainty:0.06, affect:0.04, calibration:0.01, meaning:0.01 } },
+  research: { name:"研发/产品深思",
+    w:{ logic:0.14, insight:0.14, wm:0.12, focus:0.10, thinking:0.10,
+        learn:0.08, entropy:0.08, uncertainty:0.06, calibration:0.06,
+        habit:0.04, boundary:0.03, social:0.03, affect:0.01, meaning:0.01 } },
+  wellbeing: { name:"生活恢复/韧性",
+    w:{ affect:0.14, meaning:0.10, habit:0.10, boundary:0.10, focus:0.10,
+        entropy:0.08, social:0.08, insight:0.06, logic:0.05, wm:0.05,
+        learn:0.05, thinking:0.04, uncertainty:0.03, calibration:0.02 } }
+};
+
+// 读取/保存（保持不变）
+function loadMeta(){ try{ return JSON.parse(localStorage.getItem('step4_meta')||'{}'); }catch(e){ return {}; } }
+function saveMeta(obj){ localStorage.setItem('step4_meta', JSON.stringify(obj)); }
+function saveScores(arr){ localStorage.setItem('step4_scores', JSON.stringify(arr)); }
+function saveEcoHint(obj){ localStorage.setItem('step4_eco_hint', JSON.stringify(obj)); }
+function loadWeights(){ try{ return JSON.parse(localStorage.getItem('step4_weights')||'null'); }catch(e){ return null; } }
+function saveWeights(obj){ localStorage.setItem('step4_weights', JSON.stringify(obj)); }
+function saveComposite(num){ localStorage.setItem('step4_composite', String(num)); }
+
+// 计算维度分（保持不变）
+function computeDimScore(metaItem, totalTags){
+  const f = BASE_SCORE[metaItem.freq||'偶尔']||60;
+  const d = DIR_ADJ[metaItem.dir||'适中']||0;
+  const sel = (metaItem.tags||[]).length;
+  const bonus = totalTags>0 ? Math.min(MAX_TAG_BONUS, Math.round(MAX_TAG_BONUS * sel/totalTags)) : 0;
+  let score = Math.max(0, Math.min(100, f + d + bonus));
+  // 熵增特殊：把“噪声标签”当负项，“护栏标签”当正项
+  if(metaItem.key==='entropy'){
+    const noise  = (metaItem.tags||[]).filter(t=>!t.startsWith('（低熵护栏）')).length;
+    const guards = (metaItem.tags||[]).filter(t=>t.startsWith('（低熵护栏）')).length;
+    const raw = f + d + (guards - noise) * 2; // 每条 ±2 分
+    score = Math.max(0, Math.min(100, raw));
+  }
+  return score;
+}
+
+// 生态提示（保持不变）
+function buildEcoHints(scores){
+  const eco = new Array(16).fill(0);
+  DIMENSIONS.forEach((dim, idx)=>{
+    const s = scores[idx]??60;
+    const k = (s - 60) / 40; // -1..+1（60 为中线）
+    Object.entries(dim.ecoLinks||{}).forEach(([name,w])=>{
+      const i = ECO_INDEX[name]; if(i==null) return;
+      eco[i] += k * w * 8; // 每维度最高±8 * 权重
+    });
+  });
+  const entIdx = DIMENSIONS.findIndex(d=>d.key==='entropy');
+  if(entIdx>=0){
+    const s = scores[entIdx]??60;
+    const neg = Math.max(0, (60 - s)/40); // 0..1
+    eco[ECO_INDEX["节奏管理"]]   -= neg * 4;
+    eco[ECO_INDEX["落地闭环度"]] -= neg * 4;
+    eco[ECO_INDEX["协作质量"]]   -= neg * 3;
+  }
+  const out = {};
+  eco.forEach((v,i)=>{ if(Math.abs(v)>=0.5){ out[ECO16[i]] = Math.round(v*10)/10; } });
+  return out;
+}
+
+// 综合指数 + 兜底惩罚（保持不变）
+function calcComposite(scores, weights){
+  let sumW = 0; Object.values(weights).forEach(v=> sumW += (v||0));
+  const W = {}; Object.entries(weights).forEach(([k,v])=> W[k] = (sumW>0)? v/sumW : 0);
+  let avg = 0;
+  DIMENSIONS.forEach((d,idx)=>{ const s = scores[idx]??60; const w = W[d.key]||0; avg += s * w; });
+  const idxMap = {}; DIMENSIONS.forEach((d,i)=> idxMap[d.key]=i);
+  const baseKeys = ['logic','insight','focus','wm','entropy'];
+  const minBase = Math.min(...baseKeys.map(k=> scores[idxMap[k]]??60));
+  const penalty = (minBase<60) ? Math.min(10, (60 - minBase)*0.25) : 0;
+  const final = Math.round(avg - penalty);
+  return {avg:Math.round(avg), penalty:Math.round(penalty*10)/10, final, minBase};
+}
+
+/** ========= 渲染 ========= */
+function renderPanel(){
+  const meta = loadMeta();
+  const host = document.getElementById('panel');
+  host.innerHTML = DIMENSIONS.map((dim, idx)=>{
+    const m = meta[dim.key] || {freq:"偶尔", dir:"适中", tags:[]};
+    const chips = dim.tags.map(tag=>{
+      const on = (m.tags||[]).includes(tag) ? 'active' : '';
+      return `<span class="chip ${on}" data-key="${dim.key}" data-tag="${tag}" title="点击选择/取消">${tag}</span>`;
+    }).join('');
+    const fBtns = ["从不","偶尔","常态"].map(x=> `<button class="${m.freq===x?'active':''}" data-type="freq" data-key="${dim.key}" data-val="${x}">${x}</button>`).join('');
+    const dBtns = ["偏少","适中","偏多"].map(x=> `<button class="${m.dir===x?'active':''}" data-type="dir" data-key="${dim.key}" data-val="${x}">${x}</button>`).join('');
+
+    const score = computeDimScore({...m,key:dim.key}, dim.tags.length);
+    const band = score>=75?'ok':(score<60?'bad':'warn');
+    const bandText = score>=75?'强':(score<60?'风险':'可用');
+
+    return `<div class="card" id="card-${dim.key}">
+      <div class="flex" style="justify-content:space-between">
+        <h3>${idx+1}. ${dim.name}</h3>
+        <div class="right">
+          <span class="badge ${band}"><i class="dot"></i>分数 <span class="value">${score}</span>（${bandText}）</span>
+        </div>
+      </div>
+      <div class="small">${dim.desc||''}</div>
+      <div class="kv">
+        <div>频率</div><div class="segment" data-scope="${dim.key}">${fBtns}</div>
+        <div>方向</div><div class="segment" data-scope="${dim.key}">${dBtns}</div>
+      </div>
+      <h4>标签（点击选择/取消）</h4>
+      <div class="chips" data-scope="${dim.key}">${chips}</div>
+      <div class="tip">生态联动：${
+        Object.entries(dim.ecoLinks||{}).map(([k,v])=>`${k}↑（权重${v}）`).join('，') || '—'
+      }</div>
+    </div>`;
+  }).join('');
+}
+
+function renderEcoSummary(scores){
+  const hints = buildEcoHints(scores);
+  const tbody = document.querySelector('#ecoHintsTable tbody');
+  const rows = Object.keys(hints).sort().map(name=>{
+    const v = hints[name];
+    const cls = v>=0? 'ok':'bad';
+    return `<tr><td>${name}</td><td><span class="badge ${cls}"><i class="dot"></i>Δ ${v>0?'+':''}${v}</span> 仅为方向性提示（不改变分数）</td></tr>`;
+  });
+  tbody.innerHTML = rows.length? rows.join('') : `<tr><td colspan="2" class="small">暂无（选择一些标签或调整频率/方向后会生成提示）</td></tr>`;
+  saveEcoHint(hints);
+}
+
+function renderWeightsAndComposite(){
+  const meta = loadMeta();
+  const scores = DIMENSIONS.map((d)=> computeDimScore({...meta[d.key], key:d.key}, d.tags.length));
+  saveScores(scores);
+
+  let wconf = loadWeights();
+  if(!wconf){
+    wconf = { preset:'general', weights: {...PRESETS.general.w} };
+    saveWeights(wconf);
+  }
+
+  const res = calcComposite(scores, wconf.weights);
+  saveComposite(res.final);
+
+  const $comp = document.getElementById('compVal');
+  const $band = document.getElementById('compBand');
+  const $pen  = document.getElementById('penaltyText');
+  $comp.textContent = isNaN(res.final)? '—' : res.final;
+  let bandCls='warn', bandTxt='可用';
+  if(res.final>=75){ bandCls='ok'; bandTxt='强'; }
+  if(res.final<60){ bandCls='bad'; bandTxt='风险'; }
+  $band.className = `badge ${bandCls}`;
+  $band.innerHTML = `<i class="dot"></i>${bandTxt}`;
+  $pen.textContent = `兜底惩罚：${res.penalty}（地基最小值 ${res.minBase}）`;
+
+  const tbody = document.querySelector('#wTable tbody');
+  let sumW = 0; DIMENSIONS.forEach(d=> sumW += (wconf.weights[d.key]||0));
+  const rows = DIMENSIONS.map((d,idx)=>{
+    const w = wconf.weights[d.key]||0;
+    const wPct = (sumW>0)? Math.round(w/sumW*1000)/10 : 0;
+    return `<tr><td>${idx+1}</td><td>${d.name.split('（')[0]}</td><td>${wPct}%</td><td>${scores[idx]}</td></tr>`;
+  });
+  tbody.innerHTML = rows.join('');
+  document.getElementById('wSum').textContent = '100%';
+  document.getElementById('weightedAvg').textContent = res.avg;
+
+  const sel = document.getElementById('presetSel');
+  sel.value = wconf.preset || 'general';
+
+  renderEcoSummary(scores);
+}
+
+/** ========= 事件 ========= */
+function bindEvents(){
+  const panel = document.getElementById('panel');
+  panel.addEventListener('click', (e)=>{
+    const chip = e.target.closest('.chip');
+    if(chip){
+      const key = chip.getAttribute('data-key'), tag = chip.getAttribute('data-tag');
+      const meta = loadMeta(); const m = meta[key] || {freq:'偶尔',dir:'适中',tags:[]};
+      const i = m.tags.indexOf(tag);
+      if(i>=0) m.tags.splice(i,1); else m.tags.push(tag);
+      meta[key] = m; saveMeta(meta);
+      renderPanel(); renderWeightsAndComposite();
+      return;
+    }
+    const btn = e.target.closest('button[data-type]');
+    if(btn){
+      const key = btn.getAttribute('data-key'); const type = btn.getAttribute('data-type'); const val = btn.getAttribute('data-val');
+      const meta = loadMeta(); const m = meta[key] || {freq:'偶尔',dir:'适中',tags:[]};
+      m[type] = val; meta[key] = m; saveMeta(meta);
+      renderPanel(); renderWeightsAndComposite();
+      return;
+    }
+  });
+
+  document.getElementById('btnSave').addEventListener('click', ()=>{
+    renderWeightsAndComposite();
+    alert('Step4 已保存到本地：step4_meta / step4_scores / step4_eco_hint / step4_weights / step4_composite');
+  });
+
+  document.getElementById('btnClear').addEventListener('click', ()=>{
+    if(!confirm('确定清空 Step4 的全部选择和指数？')) return;
+    localStorage.removeItem('step4_meta');
+    localStorage.removeItem('step4_scores');
+    localStorage.removeItem('step4_eco_hint');
+    localStorage.removeItem('step4_composite');
+    renderPanel(); renderWeightsAndComposite();
+  });
+
+  document.getElementById('presetSel').addEventListener('change', (e)=>{
+    const val = e.target.value || 'general';
+    const preset = PRESETS[val] || PRESETS.general;
+    const conf = { preset: val, weights: {...preset.w} };
+    saveWeights(conf);
+    renderWeightsAndComposite();
+  });
+
+  document.getElementById('btnWeightsReset').addEventListener('click', ()=>{
+    const sel = document.getElementById('presetSel');
+    const val = sel.value || 'general';
+    const preset = PRESETS[val] || PRESETS.general;
+    const conf = { preset: val, weights: {...preset.w} };
+    saveWeights(conf);
+    renderWeightsAndComposite();
+  });
+}
+
+/** ========= 初始化 ========= */
+(function init(){
+  if(!loadWeights()){
+    saveWeights({ preset:'general', weights:{...PRESETS.general.w} });
+  }
+  renderPanel();
+  renderWeightsAndComposite();
+  bindEvents();
+})();
+</script>
+</body>
+</html>
