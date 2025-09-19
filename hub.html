@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>测试中心 · Hub</title>
+  <script src="./storage.js"></script>
+  <style>
+    :root{--bg:#0b1020;--card:#121833;--ink:#e7ecff;--muted:#98a1c0;--line:#1c2447;--good:#4ade80;--warn:#f59f0b;--bad:#ff5c9a;}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(180deg,#0b1020,#0d1430);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    header{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .title{font-weight:700;font-size:18px}
+    .wrap{display:grid;grid-template-columns:minmax(340px,420px) 1fr;gap:16px;padding:16px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+    input,select,button{border-radius:10px;border:1px solid var(--line);background:#0e1633;color:var(--ink);padding:8px 10px}
+    button{cursor:pointer;white-space:nowrap}
+    .row{display:flex;gap:8px;align-items:center}
+    .row>*{min-width:0}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .list{display:flex;flex-direction:column;gap:8px;max-height:70vh;overflow:auto}
+    .user{padding:10px;border:1px solid var(--line);border-radius:10px;display:flex;justify-content:space-between;align-items:center;transition:background .2s ease,border .2s ease}
+    .user.active{border-color:var(--good);background:rgba(74,222,128,.12)}
+    .muted{color:var(--muted);font-size:12px}
+    .pill{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+    .ok{color:#0f0}
+    .warn{color:#fa0}
+    .bad{color:#f68}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .ucard{border:1px dashed var(--line);padding:10px;border-radius:12px}
+    .switch{display:flex;gap:6px;align-items:center;font-size:12px}
+    .small{font-size:12px}
+    .tag{font-size:11px;border:1px solid var(--line);padding:2px 6px;border-radius:8px}
+    .actions{display:flex;gap:6px;flex-wrap:wrap}
+    @media (max-width: 1180px){
+      header{flex-wrap:wrap;gap:10px}
+      .wrap{grid-template-columns:1fr;padding:12px}
+    }
+    @media (max-width: 900px){
+      body{font-size:15px}
+      .wrap{gap:12px}
+      .card{padding:12px}
+      .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media (max-width: 740px){
+      header{padding:14px}
+      header .row{width:100%;justify-content:flex-start;flex-wrap:wrap}
+      #btnExport,#btnImport,#btnTeamOpen{flex:1 1 auto}
+      .wrap{padding:10px}
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">测试中心 · Hub</div>
+    <div class="row">
+      <button id="btnExport">导出数据</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none"/>
+      <button id="btnImport">导入数据</button>
+      <!-- ① 顶部“团队结果”改为按钮 -->
+      <button id="btnTeamOpen">团队结果</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="col">
+        <div class="row">
+          <select id="teamSelect" style="flex:1"></select>
+          <input id="teamName" placeholder="新建团队名称" style="flex:1"/>
+          <button id="btnCreateTeam">创建/切换</button>
+        </div>
+        <hr style="border-color:var(--line)">
+        <div class="col">
+          <div class="row">
+            <input id="userName" placeholder="成员姓名" style="flex:1">
+            <input id="userTitle" placeholder="职位" style="flex:1">
+            <button id="btnAddUser">新增成员</button>
+          </div>
+        </div>
+        <hr style="border-color:var(--line)">
+        <div class="list" id="userList"></div>
+      </div>
+    </div>
+
+    <div class="card" id="detail">
+      <div class="muted">请选择左侧成员查看详情</div>
+    </div>
+  </div>
+
+<script>
+const P = window.PSYS;
+
+function fmt(ts){ if(!ts) return '-'; try{ return new Date(ts).toLocaleString(); }catch{ return ts; } }
+
+function refreshTeams(){
+  const sel = document.getElementById('teamSelect');
+  sel.innerHTML = '';
+  const teams = P.getTeams();
+  for(const t of teams){
+    const opt = document.createElement('option');
+    opt.value = t.teamId; opt.textContent = t.teamName;
+    sel.appendChild(opt);
+  }
+}
+
+let currentTeamId = null;
+let currentUserId = null;
+
+function switchTeam(tid){
+  currentTeamId = tid;
+  sessionStorage.removeItem(`${P.NS}:currentSession`);
+  refreshUserList();
+}
+
+function getLatestUserInfo(teamId){
+  const users = P.getUsers(teamId);
+  let latest = null;
+  for(const u of users){
+    const meta = P.getLastSessionMetaForUser(teamId, u.userId);
+    if(meta?.storedAt){
+      const ts = new Date(meta.storedAt).getTime();
+      if(!latest || ts > latest.ts){ latest = { user: u, meta, ts }; }
+    }
+  }
+  return latest;
+}
+
+function renderUsers(){
+  const box = document.getElementById('userList');
+  box.innerHTML = '';
+  if(!currentTeamId) return null;
+  const baseUsers = P.getUsers(currentTeamId);
+  const latestInfo = getLatestUserInfo(currentTeamId);
+  const latestUid = latestInfo?.user?.userId || null;
+  const users = latestUid ? [latestInfo.user, ...baseUsers.filter(u=>u.userId!==latestUid)] : baseUsers.slice();
+  if(currentUserId && !users.some(u=>u.userId === currentUserId)) currentUserId = null;
+  if(!currentUserId && users.length){
+    currentUserId = latestUid || users[0].userId;
+  }
+  let selectedUser = null;
+  for(const u of users){
+    const div = document.createElement('div');
+    div.className = 'user';
+    div.innerHTML = `<div>
+      <div>${u.name} · ${u.title}</div>
+      <div class="muted small">创建于 ${fmt(u.createdAt)}</div>
+    </div>
+    <div class="row">
+      <span class="pill">${u.hidden ? '已隐藏' : '参与团队'}</span>
+      <button class="small">详情</button>
+    </div>`;
+    div.querySelector('button').onclick = () => { currentUserId = u.userId; const sel = renderUsers(); if(sel){ renderUserDetail(sel); } };
+    if(u.userId === currentUserId){ div.classList.add('active'); selectedUser = u; }
+    box.appendChild(div);
+  }
+  return selectedUser;
+}
+
+function refreshUserList(){
+  const selected = renderUsers();
+  if(selected){
+    renderUserDetail(selected);
+  }else{
+    currentUserId = null;
+    document.getElementById('detail').innerHTML = '<div class="muted">请选择左侧成员查看详情</div>';
+  }
+}
+
+function openStep(page, uid){
+  const lastMeta = P.getLastSessionMetaForUser(currentTeamId, uid);
+  const rid = lastMeta?.runId || (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  const meta = { teamId: currentTeamId, userId: uid, runId: rid };
+  P.setCurrentSession(meta);
+  const url = `${page}?teamId=${encodeURIComponent(meta.teamId)}&userId=${encodeURIComponent(meta.userId)}&runId=${encodeURIComponent(meta.runId)}`;
+  window.open(url, '_blank');
+}
+
+/* ② 新增两个打开函数：Dashboard（个人）与团队页 */
+function openDashboardFor(uid){
+  if(!currentTeamId){ alert('请先选择或创建团队'); return; }
+  const lastMeta = P.getLastSessionMetaForUser(currentTeamId, uid);
+  const rid = lastMeta?.runId || (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  P.setCurrentSession({ teamId: currentTeamId, userId: uid, runId: rid });
+  const url = `dashboard_linked.html?teamId=${encodeURIComponent(currentTeamId)}&userId=${encodeURIComponent(uid)}&runId=${encodeURIComponent(rid)}`;
+  window.open(url, '_blank');
+}
+
+function openTeam(){
+  if(!currentTeamId){ alert('请先选择或创建团队'); return; }
+  const rid = (window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+  P.setCurrentSession({ teamId: currentTeamId, runId: rid });
+  const url = `team_project_radar_updated_linked.html?teamId=${encodeURIComponent(currentTeamId)}&runId=${encodeURIComponent(rid)}`;
+  window.open(url, '_blank');
+}
+
+function renderUserDetail(u){
+  const detail = document.getElementById('detail');
+  const lastMeta = P.getLastSessionMetaForUser(currentTeamId, u.userId);
+  const session = lastMeta ? P.getSession(lastMeta.teamId, lastMeta.userId, lastMeta.runId) : null;
+  const hasStep = (key) => !!(session && session[key]);
+  // Find latest run for simple status (optional)
+  const latest = P.getLatestCompletedSessionForUser(currentTeamId, u.userId);
+  const status = latest ? '已完成至少一次' : '未完成';
+  detail.innerHTML = `
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <div><b>${u.name}</b> · ${u.title} <span class="tag">${status}</span></div>
+      <div class="switch">
+        <label><input type="checkbox" id="chkHidden" ${u.hidden?'checked':''}/> 从团队聚合中隐藏</label>
+      </div>
+    </div>
+    <hr style="border-color:var(--line)">
+    <div class="grid">
+      <div class="ucard">
+        <div>Step1 自评</div>
+        <div class="muted small">${hasStep('step1') ? '该测试有填写记录 · 可继续作答' : '进入/继续作答'}</div>
+        <div class="actions">
+          <button onclick="openStep('step1_linked.html','${u.userId}')">进入</button>
+        </div>
+      </div>
+      <div class="ucard">
+        <div>Step2 环境标签</div>
+        <div class="muted small">${hasStep('step2') ? '该测试有填写记录 · 可继续作答' : '进入/继续作答'}</div>
+        <div class="actions">
+          <button onclick="openStep('step2_linked.html','${u.userId}')">进入</button>
+        </div>
+      </div>
+      <div class="ucard">
+        <div>Step3 纠偏验证</div>
+        <div class="muted small">${hasStep('step3') ? '该测试有填写记录 · 可继续作答' : '进入/继续作答'}</div>
+        <div class="actions">
+          <button onclick="openStep('step3_linked.html','${u.userId}')">进入</button>
+        </div>
+      </div>
+      <div class="ucard">
+        <div>Step4 本质标签</div>
+        <div class="muted small">${hasStep('step4') ? '该测试有填写记录 · 可继续作答' : '进入/继续作答'}</div>
+        <div class="actions">
+          <button onclick="openStep('step4_linked.html','${u.userId}')">进入</button>
+        </div>
+      </div>
+      <div class="ucard">
+        <div>个人结果</div>
+        <div class="muted small">查看该成员最近完成</div>
+        <div class="actions">
+          <!-- ③ 改为按钮：调用 openDashboardFor -->
+          <button onclick="openDashboardFor('${u.userId}')">打开 Dashboard</button>
+        </div>
+      </div>
+      <div class="ucard">
+        <div>团队结果</div>
+        <div class="muted small">仅本团队且未隐藏</div>
+        <div class="actions">
+          <!-- ③ 改为按钮：调用 openTeam -->
+          <button onclick="openTeam()">打开</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const chk = detail.querySelector('#chkHidden');
+  chk.addEventListener('change', () => {
+    P.setUserHidden(currentTeamId, u.userId, chk.checked);
+    refreshUserList();
+  });
+}
+
+document.getElementById('btnCreateTeam').onclick = () => {
+  const name = document.getElementById('teamName').value.trim();
+  if(!name){
+    const sel = document.getElementById('teamSelect');
+    if(sel.value){ switchTeam(sel.value); }
+    return;
+  }
+  const t = P.ensureTeam(name);
+  refreshTeams();
+  document.getElementById('teamSelect').value = t.teamId;
+  switchTeam(t.teamId);
+};
+
+document.getElementById('teamSelect').addEventListener('change', (e)=> switchTeam(e.target.value));
+
+function handleAddUser(){
+  if(!currentTeamId){ alert('请先选择或创建团队'); return; }
+  const n = document.getElementById('userName').value.trim();
+  const t = document.getElementById('userTitle').value.trim();
+  if(!n || !t){ alert('请输入姓名与职位'); return; }
+  P.ensureUser(currentTeamId, n, t);
+  document.getElementById('userName').value=''; document.getElementById('userTitle').value='';
+  refreshUserList();
+}
+
+document.getElementById('btnAddUser').onclick = handleAddUser;
+['userName','userTitle'].forEach(id => {
+  document.getElementById(id).addEventListener('keydown', (e) => {
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      handleAddUser();
+    }
+  });
+});
+
+// Export/Import
+document.getElementById('btnExport').onclick = () => {
+  const dump = {};
+  for(let i=0;i<localStorage.length;i++){
+    const k = localStorage.key(i);
+    if(k && k.startsWith(P.NS)) dump[k] = localStorage.getItem(k);
+  }
+  const blob = new Blob([JSON.stringify(dump,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `psys_export_${Date.now()}.json`;
+  a.click();
+};
+
+document.getElementById('btnImport').onclick = ()=> document.getElementById('importFile').click();
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const obj = JSON.parse(rd.result);
+      for(const [k,v] of Object.entries(obj)){
+        localStorage.setItem(k, v);
+      }
+      alert('导入完成');
+      refreshTeams();
+      const sel = document.getElementById('teamSelect');
+      if(sel.options.length){ switchTeam(sel.value); }
+    }catch(err){ alert('导入失败：'+err.message); }
+  };
+  rd.readAsText(f);
+});
+
+// init
+refreshTeams();
+const sel = document.getElementById('teamSelect');
+if(sel.options.length){ switchTeam(sel.value); }
+
+// ① 顶部“团队结果”按钮事件
+document.getElementById('btnTeamOpen').onclick = openTeam;
+</script>
+</body>
+</html>
