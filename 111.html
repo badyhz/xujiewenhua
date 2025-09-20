@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0E1B4D" />
+  <title>三天重建你的生活系统｜招生页（移动端）</title>
+  <meta name="description" content="三天重建你的生活系统：关系更顺、节奏更稳、目标更能达成。¥10,000/人，小班工作坊，讲授×实操×落地。" />
+  <meta property="og:title" content="三天重建你的生活系统｜招生页" />
+  <meta property="og:description" content="三天重建你的生活系统：关系更顺、节奏更稳、目标更能达成。¥10,000/人，小班工作坊，讲授×实操×落地。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_CN" />
+  <style>
+    :root{
+      --bg:#0e1530; --ink:#f2f5ff; --muted:#a7b0d9; --card:#121a3f; --line:#1f2a5a;
+      --brand:#6377ff; --brand-2:#8aa2ff; --accent:#18d3b2; --warn:#ffb020; --bad:#ff5c9a;
+      --ok:#57d38c; --shadow:0 6px 20px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;height:100%;}
+    body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC",sans-serif;color:var(--ink);background:linear-gradient(180deg,#0b1126,#0f1740 30%,#0b1126 100%);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:760px;margin:0 auto;padding:16px 16px 100px;}
+    header{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(11,17,38,.6);backdrop-filter:blur(12px);z-index:5}
+    .logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--accent));display:grid;place-items:center;font-weight:700}
+    .title{font-size:17px;line-height:1.3;font-weight:700}
+    .sub{font-size:12px;color:var(--muted)}
+
+    .hero{margin:18px 0;padding:18px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(160deg,rgba(26,35,90,.55),rgba(8,13,38,.55));box-shadow:var(--shadow)}
+    .hero h1{margin:0 0 6px;font-size:22px;line-height:1.25}
+    .hero p{margin:6px 0 0;color:var(--muted)}
+    .badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+    .badge{font-size:12px;color:#0c1330;background:linear-gradient(135deg,var(--brand-2),#c5d1ff);padding:6px 10px;border-radius:999px;font-weight:700}
+    .price{margin-top:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .pill{border:1px solid var(--line);padding:8px 12px;border-radius:12px;background:rgba(0,0,0,.15)}
+    .pill b{font-size:18px}
+
+    .sec{margin:18px 0}
+    .sec h2{font-size:18px;margin:0 0 10px}
+    .card{border:1px solid var(--line);border-radius:12px;padding:14px;background:linear-gradient(180deg,rgba(18,26,63,.6),rgba(10,14,37,.6));box-shadow:var(--shadow)}
+    .grid{display:grid;gap:12px}
+    .grid.cols-2{grid-template-columns:repeat(2,1fr)}
+    @media (min-width:560px){.grid.cols-2{grid-template-columns:repeat(2,1fr)}}
+
+    .kvs{display:grid;gap:10px}
+    .kv{display:flex;gap:10px;align-items:flex-start}
+    .kv svg{flex:0 0 20px}
+    .kv b{display:block}
+    .kv small{display:block;color:var(--muted)}
+
+    .list{margin:6px 0 0;padding:0 0 0 18px;}
+    .list li{margin:6px 0}
+
+    .timing{display:grid;gap:6px}
+    .row{display:flex;justify-content:space-between;gap:10px;padding:10px;border:1px dashed var(--line);border-radius:10px}
+
+    .faq details{border:1px solid var(--line);border-radius:10px;padding:10px;background:rgba(0,0,0,.12)}
+    .faq details+details{margin-top:10px}
+    .faq summary{cursor:pointer;font-weight:700}
+
+    .foot{margin:22px 0 100px;color:var(--muted);font-size:12px}
+
+    /* Sticky CTA */
+    .cta-bar{position:fixed;bottom:0;left:0;right:0;z-index:10;background:rgba(13,19,48,.75);backdrop-filter:blur(10px);border-top:1px solid var(--line)}
+    .cta-inner{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px}
+    .cta-info{font-size:13px;color:var(--muted)}
+    .cta-btn{flex:1;display:flex;gap:10px}
+    .btn{flex:1;display:inline-flex;align-items:center;justify-content:center;height:46px;border-radius:12px;border:none;font-weight:800;font-size:16px;cursor:pointer}
+    .btn-primary{background:linear-gradient(135deg,var(--brand),var(--accent));color:#081036;box-shadow:0 8px 18px rgba(51,120,255,.35)}
+    .btn-ghost{background:rgba(0,0,0,.15);border:1px solid var(--line);color:var(--ink)}
+
+    /* Sheet / Drawer */
+    .sheet{position:fixed;left:0;right:0;bottom:-100%;background:#0a0f27;border-top:1px solid var(--line);box-shadow:0 -12px 40px rgba(0,0,0,.5);border-radius:18px 18px 0 0;transition:bottom .35s ease;z-index:20}
+    .sheet.open{bottom:0}
+    .sheet .hd{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line)}
+    .sheet .hd b{font-size:16px}
+    .sheet .bd{padding:14px 16px 22px;max-height:66vh;overflow:auto}
+
+    .f{display:grid;gap:12px}
+    .fi label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .fi input,.fi select,.fi textarea{width:100%;background:rgba(255,255,255,.06);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:12px 12px;font-size:16px;outline:none}
+    .fi textarea{min-height:90px;resize:vertical}
+    .helper{font-size:12px;color:var(--muted)}
+
+    .ok{display:none;margin-top:10px;font-size:13px;color:var(--ok)}
+    .ok.show{display:block}
+
+    .toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 14px;border-radius:999px;opacity:0;transition:opacity .25s;z-index:30}
+    .toast.show{opacity:1}
+
+    /* Utility */
+    .tag{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--line);font-size:12px}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo" aria-hidden="true">∞</div>
+    <div>
+      <div class="title">三天重建你的生活系统</div>
+      <div class="sub">关系更顺 · 节奏更稳 · 目标更能达成</div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>把复杂方法变成日常可用的小工具</h1>
+      <p>三天小班工作坊，讲授30%｜实操50%｜答疑20%。当日可用、7天见效、90天可跟踪。</p>
+      <div class="badges">
+        <span class="badge">无需基础 · 当天能用</span>
+        <span class="badge">7天冲刺模板</span>
+        <span class="badge">90天成长路线</span>
+      </div>
+      <div class="price">
+        <div class="pill"><b>¥10,000</b> / 人（3天）</div>
+        <div class="pill">小班上限 30 人</div>
+        <div class="pill">含讲义与模板包</div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>你将收获</h2>
+      <div class="card kvs">
+        <div class="kv">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7L9 18l-5-5" stroke="#18d3b2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <div><b>3个当天可用动作</b><small>冲突降温话术、深工作启动仪式、一周节律表</small></div>
+        </div>
+        <div class="kv">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M12 5v14" stroke="#18d3b2" stroke-width="2" stroke-linecap="round"/></svg>
+          <div><b>10+张可打印模板</b><small>边界清单、复盘卡、里程碑看板、岗位对齐表等</small></div>
+        </div>
+        <div class="kv">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke="#18d3b2" stroke-width="2"/><path d="M3 7l9 6 9-6" stroke="#18d3b2" stroke-width="2"/></svg>
+          <div><b>90天成长路线</b><small>30/60/90天里程碑与衡量指标</small></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>课程大纲（3天）</h2>
+      <div class="card grid">
+        <div>
+          <div class="tag">Day 1｜关系与情绪</div>
+          <ul class="list">
+            <li>三句话建立信任：开场自我揭示｜请求-回应｜小承诺-小兑现</li>
+            <li>冲突转复盘：从谁对谁错 → 如何更好（〈冲突复盘卡〉）</li>
+            <li>五分钟复位：看见-命名-复位（〈触发器日志〉）</li>
+            <li>信息卫生：通知白名单、信息禁食窗、输入→输出闭环</li>
+          </ul>
+        </div>
+        <div>
+          <div class="tag">Day 2｜执行力与节奏</div>
+          <ul class="list">
+            <li>一周冲刺板：目标→里程碑→时间窗（〈看板模板〉）</li>
+            <li>阻力最小路径：认知/情绪/资源三类阻力一一拆解</li>
+            <li>深工作×回弹休息：90分钟专注块与微休息</li>
+            <li>应变效率：中断后快速重启（〈重启清单〉）</li>
+          </ul>
+        </div>
+        <div>
+          <div class="tag">Day 3｜岗位与长期</div>
+          <ul class="list">
+            <li>优势识别与岗位雷达：尖刀位 & 底盘位（〈岗位对齐表〉）</li>
+            <li>团队分工的极值法：谁扛尖刀、谁补地板</li>
+            <li>风险识别：避免外强中干（降低伪装成本）</li>
+            <li>发布会：30/60/90天成长路线图路演</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>适合谁</h2>
+      <div class="card grid cols-2">
+        <div class="kv"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#8aa2ff" stroke-width="2"/><path d="M8 12h8" stroke="#8aa2ff" stroke-width="2"/></svg><div><b>沟通常起冲突</b><small>伴侣/家人/同事沟通常陷入拉扯</small></div></div>
+        <div class="kv"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="14" rx="2" stroke="#8aa2ff" stroke-width="2"/><path d="M3 9h18" stroke="#8aa2ff" stroke-width="2"/></svg><div><b>节奏与专注失衡</b><small>社媒分心、作息紊乱、拖延反复</small></div></div>
+        <div class="kv"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2v20M2 12h20" stroke="#8aa2ff" stroke-width="2"/></svg><div><b>职业发展卡壳</b><small>转岗/晋升/求职，需要明确优势与短板</small></div></div>
+        <div class="kv"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12h7l2-3 2 6 2-3h5" stroke="#8aa2ff" stroke-width="2"/></svg><div><b>想系统升级生活</b><small>寻求一套可复用的工具与路线</small></div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>时间与地点</h2>
+      <div class="card timing">
+        <div class="row"><div>开课日期</div><div class="muted">请选择批次（例如：2025/10/18-10/20）</div></div>
+        <div class="row"><div>每日时长</div><div class="muted">09:30–12:30｜14:00–17:30（6.5h/天）</div></div>
+        <div class="row"><div>上课地点</div><div class="muted">城市与场地待通知（报名后短信确认）</div></div>
+        <div class="row"><div>班型规模</div><div class="muted">≤30人小班 · 讲授×实操×反馈</div></div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <h2>常见问答</h2>
+      <div class="faq">
+        <details>
+          <summary>报名后如何确认名额？</summary>
+          <div class="muted">提交报名信息后，我们会在 24 小时内通过短信/微信与你确认，并发送支付与入群信息。</div>
+        </details>
+        <details>
+          <summary>是否支持企业报销？</summary>
+          <div class="muted">支持，报名成功后可开具培训费发票（普票/专票均可）。</div>
+        </details>
+        <details>
+          <summary>能否转班或退款？</summary>
+          <div class="muted">开课前7天可无责转班或退款；开课前7天内可转让名额；开课后不支持退款。</div>
+        </details>
+      </div>
+    </section>
+
+    <section class="foot">
+      <div>主办方｜<span class="muted">你的机构/品牌名</span></div>
+      <div>咨询电话｜<a id="telLink" href="tel:REPLACE_TEL">REPLACE_TEL</a> · 咨询微信｜<span id="wxText">REPLACE_WECHAT</span></div>
+      <div class="muted" style="margin-top:6px">* 本课程为提升个人与团队效能的工作坊，拒绝任何“保证收益/快速致富”类承诺。</div>
+    </section>
+  </main>
+
+  <!-- Sticky CTA -->
+  <div class="cta-bar" role="region" aria-label="报名操作条">
+    <div class="cta-inner">
+      <div class="cta-info">¥10,000/人 · 三天小班</div>
+      <div class="cta-btn">
+        <button class="btn btn-ghost" id="btnConsult">咨询</button>
+        <button class="btn btn-primary" id="btnApply">立即报名</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Apply Sheet -->
+  <div class="sheet" id="sheet">
+    <div class="hd">
+      <b>提交报名信息</b>
+      <button class="btn btn-ghost" id="btnClose" style="flex:0 0 auto;width:auto;height:auto;padding:6px 10px;font-size:14px">关闭</button>
+    </div>
+    <div class="bd">
+      <form class="f" id="applyForm">
+        <div class="fi"><label>姓名*</label><input type="text" name="name" required placeholder="请输入姓名" /></div>
+        <div class="fi"><label>手机 / 微信*</label><input type="text" name="contact" required placeholder="用于短信/微信确认" /></div>
+        <div class="fi"><label>邮箱</label><input type="email" name="email" placeholder="可选" /></div>
+        <div class="fi"><label>期望开班城市</label>
+          <select name="city">
+            <option value="">请选择</option>
+            <option>北京</option><option>上海</option><option>深圳</option><option>广州</option><option>杭州</option><option>成都</option><option>其他</option>
+          </select>
+        </div>
+        <div class="fi"><label>备注</label><textarea name="note" placeholder="例如：发票抬头、转班需求等"></textarea></div>
+        <div class="helper">提交后会自动生成一封报名邮件（或复制报名信息），方便你直接发送给主办方。</div>
+        <button class="btn btn-primary" type="submit">提交报名</button>
+        <div class="ok" id="okMsg">已生成报名信息，请在邮件中确认发送；若未弹出邮件，请查看剪贴板并手动粘贴到聊天/邮箱。</div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">已复制到剪贴板</div>
+
+  <script>
+    // ==== 自定义占位，部署前请替换：====
+    const SIGNUP_EMAIL = 'signup@example.com'; // TODO: 替换为你的报名邮箱
+    const CONSULT_TEL = 'REPLACE_TEL'; // TODO: 替换为咨询电话（用于按钮与页脚）
+    const CONSULT_WECHAT = 'REPLACE_WECHAT'; // TODO: 替换为咨询微信号
+    // ==================================
+
+    // 初始化联系方式占位
+    const telLink = document.getElementById('telLink');
+    const wxText = document.getElementById('wxText');
+    if (CONSULT_TEL && CONSULT_TEL !== 'REPLACE_TEL') telLink.textContent = CONSULT_TEL, telLink.href = 'tel:' + CONSULT_TEL;
+    if (CONSULT_WECHAT && CONSULT_WECHAT !== 'REPLACE_WECHAT') wxText.textContent = CONSULT_WECHAT;
+
+    // Sticky CTA actions
+    const sheet = document.getElementById('sheet');
+    const btnApply = document.getElementById('btnApply');
+    const btnClose = document.getElementById('btnClose');
+    const btnConsult = document.getElementById('btnConsult');
+    btnApply.addEventListener('click', ()=> sheet.classList.add('open'));
+    btnClose.addEventListener('click', ()=> sheet.classList.remove('open'));
+    btnConsult.addEventListener('click', ()=> {
+      if (CONSULT_TEL && CONSULT_TEL !== 'REPLACE_TEL') {
+        window.location.href = 'tel:' + CONSULT_TEL;
+      } else {
+        showToast('请先在源码中填写咨询电话');
+      }
+    });
+
+    // Form logic
+    const form = document.getElementById('applyForm');
+    const okMsg = document.getElementById('okMsg');
+    const STORAGE_KEY = 'life-system-apply';
+
+    // 读取缓存
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      ['name','contact','email','city','note'].forEach(k=>{ if(saved[k]) form.elements[k].value = saved[k]; });
+    } catch(e){}
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      // 简单校验
+      if(!data.name || !data.contact){ showToast('请填写必填信息'); return; }
+      // 缓存
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+      const course = '三天重建你的生活系统（¥10,000/人）';
+      const body = `课程：${course}%0D%0A姓名：${encodeURIComponent(data.name)}%0D%0A手机/微信：${encodeURIComponent(data.contact)}%0D%0A邮箱：${encodeURIComponent(data.email||'')}%0D%0A城市：${encodeURIComponent(data.city||'')}%0D%0A备注：${encodeURIComponent(data.note||'')}%0D%0A来源：移动端招生页`;
+      const subject = encodeURIComponent('报名 - 三天重建你的生活系统');
+
+      if (SIGNUP_EMAIL && SIGNUP_EMAIL !== 'signup@example.com') {
+        const href = `mailto:${SIGNUP_EMAIL}?subject=${subject}&body=${body}`;
+        window.location.href = href;
+        okMsg.classList.add('show');
+      } else {
+        // 若未设置邮箱，复制到剪贴板
+        const plain = decodeURIComponent(body.replace(/%0D%0A/g,'\n'));
+        copyToClipboard(plain);
+        okMsg.classList.add('show');
+        showToast('已复制报名信息，请手动发送给主办方');
+      }
+    });
+
+    function copyToClipboard(text){
+      if(navigator.clipboard){ navigator.clipboard.writeText(text).catch(()=>fallbackCopy(text)); }
+      else { fallbackCopy(text); }
+    }
+    function fallbackCopy(text){
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta);
+    }
+
+    // 简易 Toast
+    const toast = document.getElementById('toast');
+    function showToast(msg){ toast.textContent = msg; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'), 1800); }
+
+    // 适配底部安全区
+    const ctaBar = document.querySelector('.cta-bar');
+    const wrap = document.querySelector('.wrap');
+    const updatePB = () => { const h = ctaBar.getBoundingClientRect().height; wrap.style.paddingBottom = (h + 24) + 'px'; };
+    window.addEventListener('resize', updatePB); updatePB();
+  </script>
+</body>
+</html>
