@@ -1,0 +1,560 @@
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商业操盘风格诊断器</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .section-title {
+            font-size: 1.8em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 700;
+        }
+        
+        .radar-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            height: 500px;
+        }
+        
+        .diagnosis-result {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .diagnosis-title {
+            font-size: 1.4em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .diagnosis-content {
+            line-height: 1.8;
+            color: #495057;
+        }
+        
+        .self-assessment {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .assessment-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+        
+        .assessment-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
+        }
+        
+        .assessment-item h4 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .rating-options {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            gap: 8px;
+        }
+        
+        .rating-option {
+            text-align: center;
+            cursor: pointer;
+            padding: 12px 8px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 600;
+            border: 2px solid #dee2e6;
+        }
+        
+        .rating-option:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .rating-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .business-stage {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stage-item {
+            background: #e9ecef;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        
+        .stage-item.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .self-assessment {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .chart-wrapper {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>商业操盘风格诊断器</h1>
+            <p class="subtitle">3分钟诊断你的商业操盘风格，识别致命盲区，找到最适合你的业务阶段和团队配置策略</p>
+        </header>
+        
+        <!-- 自评表 -->
+        <section class="section">
+            <h2 class="section-title">商业场景自评</h2>
+            <p style="margin-bottom: 25px; color: #666; font-size: 1.1em;">
+                请根据你过去一年在真实商业场景中的表现，对以下8个问题打分（1=完全不符合，5=完全符合）
+            </p>
+            <div class="self-assessment" id="selfAssessmentContainer"></div>
+            <button class="submit-btn" id="submitBtn" disabled>生成诊断报告</button>
+        </section>
+        
+        <!-- 雷达图 + 诊断结果 -->
+        <section class="section">
+            <h2 class="section-title">你的操盘风格诊断</h2>
+            <div class="radar-container">
+                <div class="chart-wrapper">
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="diagnosis-result" id="diagnosisResult">
+                    <h3 class="diagnosis-title">AI智能诊断报告</h3>
+                    <div class="diagnosis-content" id="diagnosisContent"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // 商业操盘维度定义
+        const dimensions = [
+            {
+                name: '指南针',
+                question: '我能用简单故事让团队相信一个看似遥远的目标，并吸引外部资源投入',
+                description: '愿景塑造与资源整合能力'
+            },
+            {
+                name: '岩石',
+                question: '面对核心利益威胁时，我能果断牺牲任何人、事、关系，内心毫无波澜',
+                description: '核心目标偏执与决断力'
+            },
+            {
+                name: '镜面',
+                question: '我能准确判断客户、员工、合作伙伴的底线、恐惧和真实需求',
+                description: '人性洞察与弱点识别'
+            },
+            {
+                name: '桥梁',
+                question: '我能快速找到关键人脉，并促成有价值的资源连接和价值置换',
+                description: '资源连接与网络构建'
+            },
+            {
+                name: '火焰',
+                question: '我能用语言和情绪让团队超常发挥，低成本激发忠诚度和生产力',
+                description: '情绪驱动与团队激励'
+            },
+            {
+                name: '盾牌',
+                question: '面对危机、背叛、批评，我能保持绝对理性，只解决问题不共情',
+                description: '风险隔离与情绪管理'
+            },
+            {
+                name: '水流',
+                question: '我能快速放弃过去的成功经验、承诺甚至身份，拥抱全新的玩法',
+                description: '环境适应与灵活变通'
+            },
+            {
+                name: '筋骨',
+                question: '我能把成功经验变成标准流程和系统，让新人也能复制结果',
+                description: '标准化与可复制性'
+            }
+        ];
+        
+        // 用户得分
+        let userScores = [0, 0, 0, 0, 0, 0, 0, 0];
+        let hasCompleted = false;
+        
+        // 创建自评表
+        function createSelfAssessment() {
+            const container = document.getElementById('selfAssessmentContainer');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            dimensions.forEach((dim, index) => {
+                const item = document.createElement('div');
+                item.className = 'assessment-item';
+                item.innerHTML = `
+                    <h4>${dim.name} · ${dim.description}</h4>
+                    <p>${dim.question}</p>
+                    <div class="rating-options">
+                        <div class="rating-option" data-value="1" data-index="${index}">1<br>完全不符合</div>
+                        <div class="rating-option" data-value="2" data-index="${index}">2<br>不符合</div>
+                        <div class="rating-option" data-value="3" data-index="${index}">3<br>一般</div>
+                        <div class="rating-option" data-value="4" data-index="${index}">4<br>符合</div>
+                        <div class="rating-option" data-value="5" data-index="${index}">5<br>完全符合</div>
+                    </div>
+                `;
+                
+                container.appendChild(item);
+            });
+            
+            // 添加点击事件
+            document.querySelectorAll('.rating-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    const value = parseInt(this.getAttribute('data-value'));
+                    
+                    // 移除同组其他选项的选中状态
+                    const siblings = document.querySelectorAll(`[data-index="${index}"]`);
+                    siblings.forEach(sib => sib.classList.remove('selected'));
+                    
+                    // 选中当前选项
+                    this.classList.add('selected');
+                    
+                    // 更新用户得分
+                    userScores[index] = value;
+                    
+                    // 检查是否所有问题都已回答
+                    const allAnswered = userScores.every(score => score > 0);
+                    submitBtn.disabled = !allAnswered;
+                });
+            });
+            
+            // 提交按钮事件
+            submitBtn.addEventListener('click', generateDiagnosis);
+        }
+        
+        // 生成AI诊断报告
+        function generateDiagnosis() {
+            if (!userScores.every(score => score > 0)) return;
+            
+            hasCompleted = true;
+            updateRadarChart();
+            showDiagnosisResult();
+        }
+        
+        // AI诊断逻辑
+        function getAIDiagnosis() {
+            // 找出最高分的3个维度
+            const scoredDimensions = dimensions.map((dim, index) => ({
+                ...dim,
+                score: userScores[index]
+            }));
+            
+            const top3 = scoredDimensions
+                .sort((a, b) => b.score - a.score)
+                .slice(0, 3);
+            
+            const dominantStyle = top3.map(d => d.name).join(' + ');
+            
+            // 判断适合的业务阶段
+            let businessStage = '';
+            const guideScore = userScores[0]; // 指南针
+            const rockScore = userScores[1];  // 岩石
+            const waterScore = userScores[6]; // 水流
+            const boneScore = userScores[7];  // 筋骨
+            
+            if (waterScore >= 4 && guideScore >= 4) {
+                businessStage = '创业期/转型期';
+            } else if (guideScore >= 4 && boneScore >= 3) {
+                businessStage = '成长期';
+            } else if (rockScore >= 4 && boneScore >= 4) {
+                businessStage = '成熟期/守成型';
+            } else if (waterScore >= 4 && rockScore >= 3) {
+                businessStage = '危机应对期';
+            } else {
+                businessStage = '需要风格调整';
+            }
+            
+            // 识别致命盲区
+            const weaknesses = [];
+            if (boneScore <= 2) {
+                weaknesses.push('缺乏筋骨：公司难以规模化，过度依赖个人能力');
+            }
+            if (shieldScore <= 2) {
+                weaknesses.push('缺乏盾牌：在危机和压力下容易情绪化，决策变形');
+            }
+            if (mirrorScore <= 2) {
+                weaknesses.push('缺乏镜面：容易被合作伙伴或员工算计，看不透真实动机');
+            }
+            if (waterScore <= 2) {
+                weaknesses.push('缺乏水流：环境变化时反应迟钝，错失转型机会');
+            }
+            
+            const weaknessText = weaknesses.length > 0 
+                ? weaknesses.join('；') 
+                : '你的风格相对均衡，没有明显致命盲区';
+            
+            // 团队配置建议
+            let teamAdvice = '';
+            if (boneScore <= 2 && (guideScore >= 4 || flameScore >= 4)) {
+                teamAdvice = '建议寻找一个筋骨+盾牌型的COO或运营负责人，帮你建立标准化体系和风险控制机制';
+            } else if (shieldScore <= 2 && rockScore >= 4) {
+                teamAdvice = '建议配置一个盾牌型的风险控制官或法律顾问，帮你隔离情绪干扰，保持理性决策';
+            } else if (mirrorScore <= 2 && bridgeScore >= 4) {
+                teamAdvice = '建议引入一个镜面型的商务总监或谈判专家，帮你识别合作伙伴的真实意图';
+            } else {
+                teamAdvice = '你的团队配置相对合理，重点关注业务执行和市场拓展';
+            }
+            
+            // 生成诊断报告
+            const diagnosis = `
+                <p><strong>你的操盘风格：</strong>${dominantStyle}</p>
+                <p><strong>最适合的业务阶段：</strong>${businessStage}</p>
+                <p><strong>核心优势：</strong>你擅长${top3[0].description}，这让你在${businessStage}能够${getAdvantageDescription(top3[0].name)}</p>
+                <p><strong>致命风险：</strong>${weaknessText}</p>
+                <p><strong>团队配置建议：</strong>${teamAdvice}</p>
+                <p><strong>行动建议：</strong>接下来3个月，重点提升${weaknesses.length > 0 ? '上述提到的薄弱环节' : '现有优势的系统化能力'}，为下一阶段业务发展做好准备。</p>
+            `;
+            
+            return diagnosis;
+        }
+        
+        function getAdvantageDescription(dimensionName) {
+            const advantages = {
+                '指南针': '快速凝聚人心、吸引资源，为业务发展提供方向感',
+                '岩石': '在关键时刻做出艰难但正确的决策，确保核心利益不受损',
+                '镜面': '精准把握各方真实需求，在谈判和合作中占据主动',
+                '桥梁': '高效整合外部资源，创造1+1>2的协同效应',
+                '火焰': '激发团队潜能，用最低成本获得最高执行力',
+                '盾牌': '在危机中保持冷静，将风险转化为机会',
+                '水流': '快速适应环境变化，在不确定性中找到新机会',
+                '筋骨': '建立可复制的商业模式，实现规模化增长'
+            };
+            return advantages[dimensionName] || '发挥你的核心优势';
+        }
+        
+        // 更新雷达图
+        function updateRadarChart() {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // 如果图表已存在，销毁它
+            if (window.myRadarChart) {
+                window.myRadarChart.destroy();
+            }
+            
+            const dimensionNames = dimensions.map(d => d.name);
+            
+            window.myRadarChart = new Chart(ctx, {
+                type: 'radar',
+                 {
+                    labels: dimensionNames,
+                    datasets: [{
+                        label: '你的操盘风格',
+                         userScores,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.3)',
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#667eea',
+                        borderWidth: 3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: '#e0e0e0'
+                            },
+                            grid: {
+                                color: '#f0f0f0'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 5,
+                            ticks: {
+                                stepSize: 1,
+                                backdropColor: 'transparent'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                },
+                                color: '#333'
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.parsed.r}分`;
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+        
+        // 显示诊断结果
+        function showDiagnosisResult() {
+            const diagnosisResult = document.getElementById('diagnosisResult');
+            const diagnosisContent = document.getElementById('diagnosisContent');
+            
+            diagnosisContent.innerHTML = getAIDiagnosis();
+            diagnosisResult.style.display = 'block';
+            
+            // 滚动到结果区域
+            diagnosisResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createSelfAssessment();
+            // 初始化空雷达图
+            updateRadarChart();
+        });
+    </script>
+</body>
+</html>
+```
