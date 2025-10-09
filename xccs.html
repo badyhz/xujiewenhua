@@ -1,11 +1,9 @@
-html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>商业操盘风格诊断器</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>银幕英雄人格测评 - 你是哪种老板原型？</title>
     <style>
         * {
             margin: 0;
@@ -17,152 +15,288 @@ html
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
             padding: 20px;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 900px;
             margin: 0 auto;
         }
         
         header {
             text-align: center;
-            margin-bottom: 30px;
-            padding: 30px;
-            background: white;
+            margin-bottom: 40px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
         }
         
         h1 {
-            font-size: 2.5em;
+            font-size: 2.8em;
             margin-bottom: 15px;
             font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .subtitle {
-            font-size: 1.2em;
-            opacity: 0.9;
-            max-width: 800px;
+            font-size: 1.3em;
+            color: #555;
+            max-width: 700px;
             margin: 0 auto;
             line-height: 1.8;
         }
         
         .section {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
-            padding: 30px;
+            padding: 40px;
             margin-bottom: 30px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
         }
         
-        .section-title {
-            font-size: 1.8em;
-            color: #2c3e50;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid #667eea;
-            font-weight: 700;
-        }
-        
-        .radar-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-        }
-        
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            height: 500px;
-        }
-        
-        .diagnosis-result {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            padding: 25px;
-            border-radius: 15px;
-            border-left: 4px solid #667eea;
-            margin-top: 20px;
+        .question-container {
             display: none;
         }
         
-        .diagnosis-title {
-            font-size: 1.4em;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            font-weight: 700;
+        .question-container.active {
+            display: block;
         }
         
-        .diagnosis-content {
-            line-height: 1.8;
-            color: #495057;
-        }
-        
-        .self-assessment {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-        }
-        
-        .assessment-item {
-            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-            padding: 25px;
-            border-radius: 15px;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
-        }
-        
-        .assessment-item:hover {
-            border-color: #667eea;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.2);
-        }
-        
-        .assessment-item h4 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            font-size: 1.2em;
-            font-weight: 600;
-        }
-        
-        .rating-options {
+        .question-header {
             display: flex;
             justify-content: space-between;
-            margin-top: 15px;
-            gap: 8px;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
         }
         
-        .rating-option {
-            text-align: center;
-            cursor: pointer;
-            padding: 12px 8px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 0.9em;
-            font-weight: 600;
-            border: 2px solid #dee2e6;
-        }
-        
-        .rating-option:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .rating-option.selected {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-            transform: scale(1.05);
-        }
-        
-        .submit-btn {
+        .question-number {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            margin: 0 20px;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .question-text {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .option {
+            padding: 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+            font-size: 1.1em;
+            line-height: 1.5;
+        }
+        
+        .option:hover {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+        }
+        
+        .option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+        
+        .nav-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .prev-btn {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .prev-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .next-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-btn:disabled {
+            background: #dee2e6;
+            color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+        }
+        
+        .result-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .result-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .personality-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            border: 3px solid #667eea;
+            text-align: center;
+        }
+        
+        .personality-type {
+            font-size: 2em;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .personality-subtitle {
+            font-size: 1.3em;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .personality-description {
+            font-size: 1.2em;
+            line-height: 1.8;
+            color: #495057;
+            margin-bottom: 30px;
+        }
+        
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .trait-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .trait-name {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .trait-score {
+            font-size: 2em;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .detailed-report {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        
+        .report-section {
+            margin-bottom: 25px;
+        }
+        
+        .report-section h3 {
+            color: #2c3e50;
+            font-size: 1.3em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .report-section p {
+            line-height: 1.8;
+            color: #495057;
+            font-size: 1.1em;
+        }
+        
+        .restart-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
             padding: 15px 40px;
             border: none;
@@ -173,53 +307,29 @@ html
             transition: all 0.3s ease;
             margin: 20px auto;
             display: block;
-            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
         }
         
-        .submit-btn:hover {
+        .restart-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.6);
-        }
-        
-        .submit-btn:disabled {
-            background: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .business-stage {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .stage-item {
-            background: #e9ecef;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-        }
-        
-        .stage-item.active {
-            background: #667eea;
-            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
         }
         
         @media (max-width: 768px) {
-            .self-assessment {
-                grid-template-columns: 1fr;
-            }
-            
             h1 {
-                font-size: 2em;
+                font-size: 2.2em;
             }
             
-            .chart-wrapper {
-                height: 400px;
+            .section {
+                padding: 25px;
+            }
+            
+            .question-text {
+                font-size: 1.2em;
+            }
+            
+            .option {
+                padding: 15px;
+                font-size: 1em;
             }
         }
     </style>
@@ -227,337 +337,562 @@ html
 <body>
     <div class="container">
         <header>
-            <h1>商业操盘风格诊断器</h1>
-            <p class="subtitle">3分钟诊断你的商业操盘风格，识别致命盲区，找到最适合你的业务阶段和团队配置策略</p>
+            <h1>🎬 银幕英雄人格测评</h1>
+            <p class="subtitle">3分钟诊断你的商业操盘风格，识别致命盲区，找到最适合你的老板原型</p>
         </header>
         
-        <!-- 自评表 -->
-        <section class="section">
-            <h2 class="section-title">商业场景自评</h2>
-            <p style="margin-bottom: 25px; color: #666; font-size: 1.1em;">
-                请根据你过去一年在真实商业场景中的表现，对以下8个问题打分（1=完全不符合，5=完全符合）
-            </p>
-            <div class="self-assessment" id="selfAssessmentContainer"></div>
-            <button class="submit-btn" id="submitBtn" disabled>生成诊断报告</button>
+        <!-- 测评问题区域 -->
+        <section class="section" id="questionSection">
+            <div id="questionsContainer"></div>
+            
+            <div class="navigation">
+                <button class="nav-btn prev-btn" id="prevBtn" onclick="previousQuestion()">上一题</button>
+                <button class="nav-btn next-btn" id="nextBtn" onclick="nextQuestion()">下一题</button>
+            </div>
         </section>
         
-        <!-- 雷达图 + 诊断结果 -->
-        <section class="section">
-            <h2 class="section-title">你的操盘风格诊断</h2>
-            <div class="radar-container">
-                <div class="chart-wrapper">
-                    <canvas id="radarChart"></canvas>
-                </div>
-                <div class="diagnosis-result" id="diagnosisResult">
-                    <h3 class="diagnosis-title">AI智能诊断报告</h3>
-                    <div class="diagnosis-content" id="diagnosisContent"></div>
-                </div>
+        <!-- 结果展示区域 -->
+        <section class="section result-section" id="resultSection">
+            <div class="result-header">
+                <h2 class="result-title">你的银幕英雄人格诊断</h2>
             </div>
+            
+            <div class="personality-card" id="personalityCard">
+                <div class="personality-type" id="personalityType"></div>
+                <div class="personality-subtitle" id="personalitySubtitle"></div>
+                <div class="personality-description" id="personalityDescription"></div>
+            </div>
+            
+            <div class="traits-grid" id="traitsGrid"></div>
+            
+            <div class="detailed-report" id="detailedReport"></div>
+            
+            <button class="restart-btn" onclick="restartTest()">重新测评</button>
         </section>
     </div>
 
     <script>
-        // 商业操盘维度定义
-        const dimensions = [
+        // 8维人格特质定义
+        const traits = {
+            water: { name: '水流', description: '灵活适应' },
+            rock: { name: '岩石', description: '意志坚定' },
+            bone: { name: '筋骨', description: '执行力强' },
+            compass: { name: '指南针', description: '方向明确' },
+            mirror: { name: '镜面', description: '洞察敏锐' },
+            flame: { name: '火焰', description: '激情四射' },
+            shield: { name: '盾牌', description: '防御稳固' },
+            bridge: { name: '桥梁', description: '连接协调' }
+        };
+
+        // 24道测评题目
+        const questions = [
             {
-                name: '指南针',
-                question: '我能用简单故事让团队相信一个看似遥远的目标，并吸引外部资源投入',
-                description: '愿景塑造与资源整合能力'
+                id: 1,
+                text: "你刚启动一个跨界联名项目，合作方突然提出要大幅修改方案，否则退出。你会？",
+                options: [
+                    { text: "立刻同意，顺势加入更疯狂的创意", trait: "water" },
+                    { text: "冷静分析对方底线，用利益重新谈判", trait: "mirror" },
+                    { text: "坚持原方案，宁可项目黄掉", trait: "rock" },
+                    { text: "情绪激动，指责对方不守信用", trait: "flame" }
+                ]
             },
             {
-                name: '岩石',
-                question: '面对核心利益威胁时，我能果断牺牲任何人、事、关系，内心毫无波澜',
-                description: '核心目标偏执与决断力'
+                id: 2,
+                text: "团队连续三个月业绩未达标，士气低迷。你会？",
+                options: [
+                    { text: "宣布启动\"疯狂星期五\"创意日，鼓励试错", trait: "water" },
+                    { text: "私下约谈骨干，找出真实问题", trait: "mirror" },
+                    { text: "下达死命令：下月不达标全员降薪", trait: "rock" },
+                    { text: "召开动员大会，激情演讲点燃斗志", trait: "flame" }
+                ]
             },
             {
-                name: '镜面',
-                question: '我能准确判断客户、员工、合作伙伴的底线、恐惧和真实需求',
-                description: '人性洞察与弱点识别'
+                id: 3,
+                text: "投资人要求你聚焦主业，但你发现一个全新赛道机会。你会？",
+                options: [
+                    { text: "悄悄用小团队试水新方向", trait: "water" },
+                    { text: "用数据说服投资人这是战略延伸", trait: "mirror" },
+                    { text: "明确拒绝：\"我的战略不会因钱改变\"", trait: "rock" },
+                    { text: "用宏大愿景让投资人主动追加投资", trait: "flame" }
+                ]
             },
             {
-                name: '桥梁',
-                question: '我能快速找到关键人脉，并促成有价值的资源连接和价值置换',
-                description: '资源连接与网络构建'
+                id: 4,
+                text: "核心高管集体反对你的新战略，认为风险太大。你会？",
+                options: [
+                    { text: "暂停计划，重新收集反馈", trait: "water" },
+                    { text: "逐个约谈，瓦解反对联盟", trait: "mirror" },
+                    { text: "\"这是命令，执行或离职\"", trait: "rock" },
+                    { text: "用个人魅力说服他们相信未来", trait: "flame" }
+                ]
             },
             {
-                name: '火焰',
-                question: '我能用语言和情绪让团队超常发挥，低成本激发忠诚度和生产力',
-                description: '情绪驱动与团队激励'
+                id: 5,
+                text: "公司遭遇重大公关危机，律师建议道歉。你会？",
+                options: [
+                    { text: "迅速道歉并承诺整改", trait: "water" },
+                    { text: "先调查谁在背后推动", trait: "mirror" },
+                    { text: "\"我们没错，绝不低头\"", trait: "rock" },
+                    { text: "召开发布会强硬反击", trait: "flame" }
+                ]
             },
             {
-                name: '盾牌',
-                question: '面对危机、背叛、批评，我能保持绝对理性，只解决问题不共情',
-                description: '风险隔离与情绪管理'
+                id: 6,
+                text: "家人重病需你陪伴，但关键融资会议在同一天。你会？",
+                options: [
+                    { text: "推迟会议，家庭优先", trait: "water" },
+                    { text: "让副手代开，自己远程支持", trait: "mirror" },
+                    { text: "\"会议更重要，家人会理解\"", trait: "rock" },
+                    { text: "一边陪家人一边电话指挥", trait: "flame" }
+                ]
             },
             {
-                name: '水流',
-                question: '我能快速放弃过去的成功经验、承诺甚至身份，拥抱全新的玩法',
-                description: '环境适应与灵活变通'
+                id: 7,
+                text: "新系统上线后漏洞频出，团队建议回滚旧版。你会？",
+                options: [
+                    { text: "立刻回滚，再小步迭代", trait: "water" },
+                    { text: "分析漏洞根源，针对性修复", trait: "mirror" },
+                    { text: "\"按计划推进，问题必须解决\"", trait: "bone" },
+                    { text: "亲自督战，三天内必须搞定", trait: "flame" }
+                ]
             },
             {
-                name: '筋骨',
-                question: '我能把成功经验变成标准流程和系统，让新人也能复制结果',
-                description: '标准化与可复制性'
+                id: 8,
+                text: "客户要求定制化功能，但会打乱产品路线图。你会？",
+                options: [
+                    { text: "接受需求，灵活调整路线", trait: "water" },
+                    { text: "评估客户价值，选择性满足", trait: "mirror" },
+                    { text: "\"我们的产品不接受定制\"", trait: "bone" },
+                    { text: "承诺为客户单独开发", trait: "flame" }
+                ]
+            },
+            {
+                id: 9,
+                text: "团队抱怨流程太僵化，效率低下。你会？",
+                options: [
+                    { text: "简化流程，授权一线决策", trait: "water" },
+                    { text: "调研痛点，优化关键节点", trait: "mirror" },
+                    { text: "\"流程是效率的保障，必须遵守\"", trait: "bone" },
+                    { text: "用奖金激励高效执行者", trait: "flame" }
+                ]
+            },
+            {
+                id: 10,
+                text: "发现竞品用灰色手段抢走客户，你会？",
+                options: [
+                    { text: "学习对方手段，加倍奉还", trait: "compass" },
+                    { text: "收集证据，法律+舆论反击", trait: "mirror" },
+                    { text: "坚持正道，用产品赢回来", trait: "rock" },
+                    { text: "公开谴责，发动行业声讨", trait: "flame" }
+                ]
+            },
+            {
+                id: 11,
+                text: "投资人要求你裁员30%以提升利润。你会？",
+                options: [
+                    { text: "接受，但用期权留住核心", trait: "compass" },
+                    { text: "谈判用其他方式降本", trait: "mirror" },
+                    { text: "拒绝：\"我的团队一个都不能少\"", trait: "rock" },
+                    { text: "用激情演讲让团队自愿降薪", trait: "flame" }
+                ]
+            },
+            {
+                id: 12,
+                text: "政府出台新规，你的核心业务面临合规风险。你会？",
+                options: [
+                    { text: "转型新业务，放弃旧赛道", trait: "compass" },
+                    { text: "游说政策制定者修改条款", trait: "mirror" },
+                    { text: "坚持原有模式，赌政策会松动", trait: "rock" },
+                    { text: "发动用户联名抗议", trait: "flame" }
+                ]
+            },
+            {
+                id: 13,
+                text: "合伙人表面支持你，但私下接触投资人。你会？",
+                options: [
+                    { text: "装作不知，观察其下一步", trait: "mirror" },
+                    { text: "直接摊牌，逼他二选一", trait: "rock" },
+                    { text: "用更大利益绑住他", trait: "bridge" },
+                    { text: "情绪爆发，当场翻脸", trait: "flame" }
+                ]
+            },
+            {
+                id: 14,
+                text: "客户说预算不足，但你怀疑他在压价。你会？",
+                options: [
+                    { text: "降低配置，匹配其预算", trait: "water" },
+                    { text: "试探其真实预算和决策链", trait: "mirror" },
+                    { text: "坚持报价，不接受砍价", trait: "rock" },
+                    { text: "用稀缺性逼他立刻决定", trait: "flame" }
+                ]
+            },
+            {
+                id: 15,
+                text: "团队骨干突然提出离职，理由模糊。你会？",
+                options: [
+                    { text: "立刻批准，避免影响士气", trait: "water" },
+                    { text: "深聊找出真实原因", trait: "mirror" },
+                    { text: "\"离职可以，竞业协议生效\"", trait: "rock" },
+                    { text: "用更高职位和薪资挽留", trait: "flame" }
+                ]
+            },
+            {
+                id: 16,
+                text: "新产品发布遇冷，团队士气崩溃。你会？",
+                options: [
+                    { text: "快速迭代，推出2.0版本", trait: "water" },
+                    { text: "分析数据，找出核心问题", trait: "mirror" },
+                    { text: "\"失败是暂时的，必须坚持\"", trait: "rock" },
+                    { text: "召开全员大会，激情演讲重燃斗志", trait: "flame" }
+                ]
+            },
+            {
+                id: 17,
+                text: "竞争对手发起价格战，你会？",
+                options: [
+                    { text: "跟进降价，同时推增值服务", trait: "water" },
+                    { text: "研究对手成本结构，精准反击", trait: "mirror" },
+                    { text: "不降价，用品质说话", trait: "rock" },
+                    { text: "发起营销大战，烧钱也要赢", trait: "flame" }
+                ]
+            },
+            {
+                id: 18,
+                text: "投资人质疑你的愿景不切实际。你会？",
+                options: [
+                    { text: "调整愿景，更接地气", trait: "water" },
+                    { text: "用数据证明可行性", trait: "mirror" },
+                    { text: "\"你可以不信，但我会做到\"", trait: "rock" },
+                    { text: "用感染力让投资人当场转变", trait: "flame" }
+                ]
+            },
+            {
+                id: 19,
+                text: "被媒体恶意报道，全网骂你。你会？",
+                options: [
+                    { text: "迅速回应，澄清事实", trait: "water" },
+                    { text: "分析报道背后的利益方", trait: "mirror" },
+                    { text: "沉默，让时间冲淡一切", trait: "shield" },
+                    { text: "召开发布会强硬回击", trait: "flame" }
+                ]
+            },
+            {
+                id: 20,
+                text: "最信任的合伙人背叛你，你会？",
+                options: [
+                    { text: "尝试沟通，修复关系", trait: "water" },
+                    { text: "收集证据，法律+商业反击", trait: "mirror" },
+                    { text: "切断所有联系，永不原谅", trait: "shield" },
+                    { text: "公开揭露，让他身败名裂", trait: "flame" }
+                ]
+            },
+            {
+                id: 21,
+                text: "团队因你的决策失误而损失惨重，你会？",
+                options: [
+                    { text: "道歉并承担责任", trait: "water" },
+                    { text: "复盘错误，优化决策机制", trait: "mirror" },
+                    { text: "\"责任我担，但工作继续\"", trait: "shield" },
+                    { text: "用更激进的目标转移注意力", trait: "flame" }
+                ]
+            },
+            {
+                id: 22,
+                text: "两个核心高管激烈冲突，影响业务。你会？",
+                options: [
+                    { text: "调整组织架构，物理隔离", trait: "water" },
+                    { text: "分别谈话，找出利益冲突点", trait: "mirror" },
+                    { text: "\"谁影响业务，谁就走人\"", trait: "rock" },
+                    { text: "组织团建，重建信任", trait: "bridge" }
+                ]
+            },
+            {
+                id: 23,
+                text: "大客户要求你站队，反对其竞争对手（你的朋友）。你会？",
+                options: [
+                    { text: "灵活周旋，两边不得罪", trait: "water" },
+                    { text: "分析站队的长期利弊", trait: "mirror" },
+                    { text: "\"我的原则是不站队\"", trait: "rock" },
+                    { text: "用情感打动客户理解", trait: "bridge" }
+                ]
+            },
+            {
+                id: 24,
+                text: "投资人和创始团队在战略上严重分歧。你会？",
+                options: [
+                    { text: "提出折中方案", trait: "water" },
+                    { text: "分别说服，找到共同利益点", trait: "mirror" },
+                    { text: "支持创始人，对抗投资人", trait: "rock" },
+                    { text: "组织三方会议，重建信任", trait: "bridge" }
+                ]
             }
         ];
-        
-        // 用户得分
-        let userScores = [0, 0, 0, 0, 0, 0, 0, 0];
-        let hasCompleted = false;
-        
-        // 创建自评表
-        function createSelfAssessment() {
-            const container = document.getElementById('selfAssessmentContainer');
-            const submitBtn = document.getElementById('submitBtn');
+
+        // 人格类型定义
+        const personalityTypes = {
+            water: {
+                name: "灵活的变革者",
+                subtitle: "如水般适应环境的创新领袖",
+                description: "你像水一样灵活，能够快速适应环境变化，在不确定性中找到新机会。你善于创新和变通，但有时可能缺乏持续性。",
+                character: "杰克·斯派洛船长",
+                advantages: "环境适应能力强，创新思维活跃，危机应对灵活",
+                risks: "容易半途而废，缺乏长期坚持，决策可能过于随意",
+                advice: "建立更强的执行体系，为创意想法配备筋骨型的执行团队"
+            },
+            rock: {
+                name: "不屈的守护者",
+                subtitle: "如岩石般坚定不移的意志领袖",
+                description: "你拥有钢铁般的意志，能在最困难的时刻坚守信念。你的坚持和决断力是团队的定海神针，但有时可能过于固执。",
+                character: "安迪·杜佛兰",
+                advantages: "意志坚定，原则性强，能在逆境中坚持",
+                risks: "过于固执，难以变通，可能错失机会",
+                advice: "适当增加灵活性，学会在坚持原则的同时调整策略"
+            },
+            bone: {
+                name: "可靠的执行者",
+                subtitle: "如筋骨般强韧的系统建设者",
+                description: "你是天生的执行专家，善于将想法转化为现实。你建立的系统和流程能够确保团队高效运转，但有时可能缺乏创新。",
+                character: "阿甘",
+                advantages: "执行力强，系统思维，能建立可复制的模式",
+                risks: "缺乏灵活性，创新不足，可能过于机械化",
+                advice: "增加创新思维，适当授权团队进行灵活调整"
+            },
+            compass: {
+                name: "远见的引路人",
+                subtitle: "如指南针般明确方向的愿景领袖",
+                description: "你拥有清晰的愿景和方向感，能够为团队指明前进的道路。你的信念和目标感染力强，但有时可能偏离现实。",
+                character: "史蒂夫·乔布斯",
+                advantages: "愿景清晰，方向感强，能凝聚团队",
+                risks: "可能脱离现实，忽视细节，过于理想化",
+                advice: "加强市场调研，配备镜面型的洞察专家"
+            },
+            mirror: {
+                name: "敏锐的洞察者",
+                subtitle: "如镜面般透彻的人性解读者",
+                description: "你拥有敏锐的洞察力，能够看透人心和局势。你的分析能力和判断力帮助团队避免陷阱，但有时可能过于冷漠。",
+                character: "汉尼拔·莱克特",
+                advantages: "洞察力强，分析能力出色，善于识别风险",
+                risks: "可能过于冷漠，缺乏情感连接，容易孤立",
+                advice: "增强情感表达，学会用温度化解距离感"
+            },
+            flame: {
+                name: "激情的点燃者",
+                subtitle: "如火焰般炽热的激励大师",
+                description: "你拥有强大的感染力和激情，能够点燃团队的斗志。你的能量和热情是团队前进的动力，但有时可能过于冲动。",
+                character: "托尼·斯塔克",
+                advantages: "激情四射，感染力强，能激发团队潜能",
+                risks: "容易冲动，情绪化决策，可能烧伤他人",
+                advice: "学会控制情绪，配备盾牌型的理性顾问"
+            },
+            shield: {
+                name: "冷静的防御者",
+                subtitle: "如盾牌般稳固的风险管控者",
+                description: "你拥有强大的情绪控制能力，能在危机中保持冷静。你的理性和稳定是团队的安全保障，但有时可能过于冷漠。",
+                character: "蝙蝠侠",
+                advantages: "情绪稳定，风险意识强，危机处理能力出色",
+                risks: "可能过于冷漠，缺乏激情，难以激励他人",
+                advice: "适当展现情感，学会用温暖的方式传递关怀"
+            },
+            bridge: {
+                name: "和谐的连接者",
+                subtitle: "如桥梁般沟通的关系建设者",
+                description: "你善于建立连接和信任，能够协调各方利益。你的沟通能力和人际关系是团队合作的基础，但有时可能过于妥协。",
+                character: "甘道夫",
+                advantages: "沟通能力强，善于协调，能建立信任关系",
+                risks: "可能过于妥协，缺乏原则性，难以做出艰难决策",
+                advice: "增强原则性，学会在必要时坚持立场"
+            }
+        };
+
+        // 当前状态
+        let currentQuestion = 0;
+        let answers = {};
+        let scores = {
+            water: 0, rock: 0, bone: 0, compass: 0,
+            mirror: 0, flame: 0, shield: 0, bridge: 0
+        };
+
+        // 初始化测评
+        function initTest() {
+            createQuestions();
+            showQuestion(0);
+            updateNavigation();
+        }
+
+        // 创建问题
+        function createQuestions() {
+            const container = document.getElementById('questionsContainer');
             
-            dimensions.forEach((dim, index) => {
-                const item = document.createElement('div');
-                item.className = 'assessment-item';
-                item.innerHTML = `
-                    <h4>${dim.name} · ${dim.description}</h4>
-                    <p>${dim.question}</p>
-                    <div class="rating-options">
-                        <div class="rating-option" data-value="1" data-index="${index}">1<br>完全不符合</div>
-                        <div class="rating-option" data-value="2" data-index="${index}">2<br>不符合</div>
-                        <div class="rating-option" data-value="3" data-index="${index}">3<br>一般</div>
-                        <div class="rating-option" data-value="4" data-index="${index}">4<br>符合</div>
-                        <div class="rating-option" data-value="5" data-index="${index}">5<br>完全符合</div>
+            questions.forEach((question, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-container';
+                questionDiv.id = `question-${index}`;
+                
+                questionDiv.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-number">第 ${index + 1} 题</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${((index + 1) / questions.length) * 100}%"></div>
+                        </div>
+                        <div style="color: #667eea; font-weight: 600;">${index + 1}/${questions.length}</div>
+                    </div>
+                    <div class="question-text">${question.text}</div>
+                    <div class="options">
+                        ${question.options.map((option, optionIndex) => `
+                            <div class="option" onclick="selectOption(${index}, ${optionIndex}, '${option.trait}')">
+                                ${String.fromCharCode(65 + optionIndex)}. ${option.text}
+                            </div>
+                        `).join('')}
                     </div>
                 `;
                 
-                container.appendChild(item);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        // 显示问题
+        function showQuestion(index) {
+            document.querySelectorAll('.question-container').forEach(q => q.classList.remove('active'));
+            document.getElementById(`question-${index}`).classList.add('active');
+            currentQuestion = index;
+            updateNavigation();
+        }
+
+        // 选择选项
+        function selectOption(questionIndex, optionIndex, trait) {
+            // 移除同题其他选项的选中状态
+            const questionDiv = document.getElementById(`question-${questionIndex}`);
+            questionDiv.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            
+            // 选中当前选项
+            questionDiv.querySelectorAll('.option')[optionIndex].classList.add('selected');
+            
+            // 记录答案
+            if (answers[questionIndex]) {
+                // 如果之前有答案，先减去之前的分数
+                scores[answers[questionIndex]]--;
+            }
+            
+            answers[questionIndex] = trait;
+            scores[trait]++;
+            
+            updateNavigation();
+        }
+
+        // 上一题
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                showQuestion(currentQuestion - 1);
+            }
+        }
+
+        // 下一题
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                showQuestion(currentQuestion + 1);
+            } else if (Object.keys(answers).length === questions.length) {
+                showResults();
+            }
+        }
+
+        // 更新导航按钮
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentQuestion === 0;
+            
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.textContent = '查看结果';
+                nextBtn.disabled = Object.keys(answers).length !== questions.length;
+            } else {
+                nextBtn.textContent = '下一题';
+                nextBtn.disabled = !answers[currentQuestion];
+            }
+        }
+
+        // 显示结果
+        function showResults() {
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('resultSection').classList.add('active');
+            
+            // 找出主导特质
+            const sortedTraits = Object.entries(scores)
+                .sort(([,a], [,b]) => b - a)
+                .filter(([,score]) => score > 0);
+            
+            const dominantTrait = sortedTraits[0][0];
+            const personality = personalityTypes[dominantTrait];
+            
+            // 显示人格类型
+            document.getElementById('personalityType').textContent = personality.name;
+            document.getElementById('personalitySubtitle').textContent = personality.subtitle;
+            document.getElementById('personalityDescription').textContent = personality.description;
+            
+            // 显示特质分数
+            const traitsGrid = document.getElementById('traitsGrid');
+            traitsGrid.innerHTML = '';
+            
+            sortedTraits.forEach(([trait, score]) => {
+                const traitDiv = document.createElement('div');
+                traitDiv.className = 'trait-item';
+                traitDiv.innerHTML = `
+                    <div class="trait-name">${traits[trait].name}</div>
+                    <div class="trait-score">${score}</div>
+                    <div style="font-size: 0.9em; color: #6c757d;">${traits[trait].description}</div>
+                `;
+                traitsGrid.appendChild(traitDiv);
             });
             
-            // 添加点击事件
-            document.querySelectorAll('.rating-option').forEach(option => {
-                option.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    const value = parseInt(this.getAttribute('data-value'));
-                    
-                    // 移除同组其他选项的选中状态
-                    const siblings = document.querySelectorAll(`[data-index="${index}"]`);
-                    siblings.forEach(sib => sib.classList.remove('selected'));
-                    
-                    // 选中当前选项
-                    this.classList.add('selected');
-                    
-                    // 更新用户得分
-                    userScores[index] = value;
-                    
-                    // 检查是否所有问题都已回答
-                    const allAnswered = userScores.every(score => score > 0);
-                    submitBtn.disabled = !allAnswered;
-                });
-            });
-            
-            // 提交按钮事件
-            submitBtn.addEventListener('click', generateDiagnosis);
-        }
-        
-        // 生成AI诊断报告
-        function generateDiagnosis() {
-            if (!userScores.every(score => score > 0)) return;
-            
-            hasCompleted = true;
-            updateRadarChart();
-            showDiagnosisResult();
-        }
-        
-        // AI诊断逻辑
-        function getAIDiagnosis() {
-            // 找出最高分的3个维度
-            const scoredDimensions = dimensions.map((dim, index) => ({
-                ...dim,
-                score: userScores[index]
-            }));
-            
-            const top3 = scoredDimensions
-                .sort((a, b) => b.score - a.score)
-                .slice(0, 3);
-            
-            const dominantStyle = top3.map(d => d.name).join(' + ');
-            
-            // 判断适合的业务阶段
-            let businessStage = '';
-            const guideScore = userScores[0]; // 指南针
-            const rockScore = userScores[1];  // 岩石
-            const mirrorScore = userScores[2]; // 镜面
-            const bridgeScore = userScores[3]; // 桥梁
-            const flameScore = userScores[4];  // 火焰
-            const shieldScore = userScores[5]; // 盾牌
-            const waterScore = userScores[6]; // 水流
-            const boneScore = userScores[7];  // 筋骨
-            
-            if (waterScore >= 4 && guideScore >= 4) {
-                businessStage = '创业期/转型期';
-            } else if (guideScore >= 4 && boneScore >= 3) {
-                businessStage = '成长期';
-            } else if (rockScore >= 4 && boneScore >= 4) {
-                businessStage = '成熟期/守成型';
-            } else if (waterScore >= 4 && rockScore >= 3) {
-                businessStage = '危机应对期';
-            } else {
-                businessStage = '需要风格调整';
-            }
-            
-            // 识别致命盲区
-            const weaknesses = [];
-            if (boneScore <= 2) {
-                weaknesses.push('缺乏筋骨：公司难以规模化，过度依赖个人能力');
-            }
-            if (shieldScore <= 2) {
-                weaknesses.push('缺乏盾牌：在危机和压力下容易情绪化，决策变形');
-            }
-            if (mirrorScore <= 2) {
-                weaknesses.push('缺乏镜面：容易被合作伙伴或员工算计，看不透真实动机');
-            }
-            if (waterScore <= 2) {
-                weaknesses.push('缺乏水流：环境变化时反应迟钝，错失转型机会');
-            }
-            
-            const weaknessText = weaknesses.length > 0 
-                ? weaknesses.join('；') 
-                : '你的风格相对均衡，没有明显致命盲区';
-            
-            // 团队配置建议
-            let teamAdvice = '';
-            if (boneScore <= 2 && (guideScore >= 4 || flameScore >= 4)) {
-                teamAdvice = '建议寻找一个筋骨+盾牌型的COO或运营负责人，帮你建立标准化体系和风险控制机制';
-            } else if (shieldScore <= 2 && rockScore >= 4) {
-                teamAdvice = '建议配置一个盾牌型的风险控制官或法律顾问，帮你隔离情绪干扰，保持理性决策';
-            } else if (mirrorScore <= 2 && bridgeScore >= 4) {
-                teamAdvice = '建议引入一个镜面型的商务总监或谈判专家，帮你识别合作伙伴的真实意图';
-            } else {
-                teamAdvice = '你的团队配置相对合理，重点关注业务执行和市场拓展';
-            }
-            
-            // 生成诊断报告
-            const diagnosis = `
-                <p><strong>你的操盘风格：</strong>${dominantStyle}</p>
-                <p><strong>最适合的业务阶段：</strong>${businessStage}</p>
-                <p><strong>核心优势：</strong>你擅长${top3[0].description}，这让你在${businessStage}能够${getAdvantageDescription(top3[0].name)}</p>
-                <p><strong>致命风险：</strong>${weaknessText}</p>
-                <p><strong>团队配置建议：</strong>${teamAdvice}</p>
-                <p><strong>行动建议：</strong>接下来3个月，重点提升${weaknesses.length > 0 ? '上述提到的薄弱环节' : '现有优势的系统化能力'}，为下一阶段业务发展做好准备。</p>
+            // 显示详细报告
+            const detailedReport = document.getElementById('detailedReport');
+            detailedReport.innerHTML = `
+                <div class="report-section">
+                    <h3>🎭 对应影视角色</h3>
+                    <p><strong>${personality.character}</strong> - 你的行为模式与这个角色高度相似</p>
+                </div>
+                <div class="report-section">
+                    <h3>💪 核心优势</h3>
+                    <p>${personality.advantages}</p>
+                </div>
+                <div class="report-section">
+                    <h3>⚠️ 潜在风险</h3>
+                    <p>${personality.risks}</p>
+                </div>
+                <div class="report-section">
+                    <h3>🚀 发展建议</h3>
+                    <p>${personality.advice}</p>
+                </div>
+                <div class="report-section">
+                    <h3>📊 你的人格构成</h3>
+                    <p>主导特质：<strong>${traits[dominantTrait].name}</strong> (${scores[dominantTrait]}分)</p>
+                    <p>次要特质：${sortedTraits.slice(1, 3).map(([trait, score]) => 
+                        `${traits[trait].name} (${score}分)`).join('、')}</p>
+                </div>
             `;
-            
-            return diagnosis;
         }
-        
-        function getAdvantageDescription(dimensionName) {
-            const advantages = {
-                '指南针': '快速凝聚人心、吸引资源，为业务发展提供方向感',
-                '岩石': '在关键时刻做出艰难但正确的决策，确保核心利益不受损',
-                '镜面': '精准把握各方真实需求，在谈判和合作中占据主动',
-                '桥梁': '高效整合外部资源，创造1+1>2的协同效应',
-                '火焰': '激发团队潜能，用最低成本获得最高执行力',
-                '盾牌': '在危机中保持冷静，将风险转化为机会',
-                '水流': '快速适应环境变化，在不确定性中找到新机会',
-                '筋骨': '建立可复制的商业模式，实现规模化增长'
+
+        // 重新开始测评
+        function restartTest() {
+            currentQuestion = 0;
+            answers = {};
+            scores = {
+                water: 0, rock: 0, bone: 0, compass: 0,
+                mirror: 0, flame: 0, shield: 0, bridge: 0
             };
-            return advantages[dimensionName] || '发挥你的核心优势';
+            
+            // 清除所有选中状态
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            
+            // 显示问题区域
+            document.getElementById('questionSection').style.display = 'block';
+            document.getElementById('resultSection').classList.remove('active');
+            
+            showQuestion(0);
         }
-        
-        // 更新雷达图
-        function updateRadarChart() {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            
-            // 如果图表已存在，销毁它
-            if (window.myRadarChart) {
-                window.myRadarChart.destroy();
-            }
-            
-            const dimensionNames = dimensions.map(d => d.name);
-            
-            window.myRadarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: dimensionNames,
-                    datasets: [{
-                        label: '你的操盘风格',
-                        data: userScores,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.3)',
-                        pointBackgroundColor: '#667eea',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#667eea',
-                        borderWidth: 3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: {
-                                color: '#e0e0e0'
-                            },
-                            grid: {
-                                color: '#f0f0f0'
-                            },
-                            pointLabels: {
-                                font: {
-                                    size: 12,
-                                    weight: 'bold'
-                                },
-                                color: '#333'
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 5,
-                            ticks: {
-                                stepSize: 1,
-                                backdropColor: 'transparent'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                            labels: {
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                },
-                                color: '#333'
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.parsed.r}分`;
-                                }
-                            }
-                        }
-                    },
-                    animation: {
-                        duration: 1500,
-                        easing: 'easeOutQuart'
-                    }
-                }
-            });
-        }
-        
-        // 显示诊断结果
-        function showDiagnosisResult() {
-            const diagnosisResult = document.getElementById('diagnosisResult');
-            const diagnosisContent = document.getElementById('diagnosisContent');
-            
-            diagnosisContent.innerHTML = getAIDiagnosis();
-            diagnosisResult.style.display = 'block';
-            
-            // 滚动到结果区域
-            diagnosisResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        
-        // 初始化
-        document.addEventListener('DOMContentLoaded', function() {
-            createSelfAssessment();
-            // 初始化空雷达图
-            updateRadarChart();
-        });
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', initTest);
     </script>
 </body>
 </html>
