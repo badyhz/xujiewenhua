@@ -1,4 +1,4 @@
-```html
+html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -381,6 +381,10 @@
             let businessStage = '';
             const guideScore = userScores[0]; // 指南针
             const rockScore = userScores[1];  // 岩石
+            const mirrorScore = userScores[2]; // 镜面
+            const bridgeScore = userScores[3]; // 桥梁
+            const flameScore = userScores[4];  // 火焰
+            const shieldScore = userScores[5]; // 盾牌
             const waterScore = userScores[6]; // 水流
             const boneScore = userScores[7];  // 筋骨
             
@@ -467,11 +471,11 @@
             
             window.myRadarChart = new Chart(ctx, {
                 type: 'radar',
-                 {
+                data: {
                     labels: dimensionNames,
                     datasets: [{
                         label: '你的操盘风格',
-                         userScores,
+                        data: userScores,
                         borderColor: '#667eea',
                         backgroundColor: 'rgba(102, 126, 234, 0.3)',
                         pointBackgroundColor: '#667eea',
@@ -557,4 +561,3 @@
     </script>
 </body>
 </html>
-```
