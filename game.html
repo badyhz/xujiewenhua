@@ -446,17 +446,154 @@
                 padding: 10px;
             }
             
+            .header {
+                padding: 20px 15px;
+                margin-bottom: 20px;
+            }
+            
             .header h1 {
-                font-size: 2em;
+                font-size: 2.2em;
+                margin-bottom: 10px;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+            
+            .game-section {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+            
+            .section-title {
+                font-size: 1.4em;
+                margin-bottom: 15px;
             }
             
             .player-setup {
                 grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .player-card {
+                padding: 15px;
+            }
+            
+            .player-info {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .info-item {
+                padding: 10px;
+            }
+            
+            .trait-cards {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .trait-card {
+                padding: 12px;
+            }
+            
+            .player-list {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
             }
             
             .decision-buttons {
                 flex-direction: column;
                 align-items: center;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+                padding: 12px 20px;
+                font-size: 14px;
+                margin: 5px 0;
+            }
+            
+            .game-controls {
+                text-align: center;
+            }
+            
+            .game-controls select {
+                width: 100%;
+                max-width: 200px;
+                padding: 10px;
+                margin: 10px 0;
+                border-radius: 5px;
+                border: 1px solid #666;
+                background: #2a2a2a;
+                color: white;
+                font-size: 16px;
+            }
+            
+            .round-info {
+                padding: 15px;
+            }
+            
+            .round-info h3 {
+                font-size: 1.4em;
+            }
+            
+            .opportunity-card {
+                padding: 15px;
+                margin: 10px 0;
+            }
+            
+            .cooperation-panel {
+                padding: 15px;
+            }
+            
+            .results-panel {
+                padding: 20px 15px;
+            }
+            
+            .final-results {
+                padding: 20px 15px;
+            }
+            
+            .modal-content {
+                padding: 20px 15px;
+                margin: 20px;
+                width: calc(100% - 40px);
+            }
+            
+            .log-panel {
+                padding: 10px;
+                font-size: 0.8em;
+                max-height: 150px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+            
+            .section-title {
+                font-size: 1.2em;
+            }
+            
+            .player-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+            
+            .info-value {
+                font-size: 1em;
+            }
+            
+            .trait-card {
+                padding: 10px;
             }
         }
 
