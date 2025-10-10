@@ -190,6 +190,18 @@
         .info-value {
             font-size: 1.2em;
             font-weight: bold;
+            color: #ffffff;
+        }
+
+        .role-name {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .secret-mission {
+            color: #87CEEB;
+            font-size: 0.9em;
+            line-height: 1.3;
         }
 
         .capital { color: #FFD700; }
@@ -626,6 +638,31 @@
             font-weight: bold;
         }
 
+        .player-select {
+            padding: 8px 12px;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #2c1810, #3d2817);
+            color: #d4af37;
+            font-size: 14px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .player-select:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .buy-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
         .class-worker {
             color: #dda0dd;
             font-weight: bold;
@@ -951,7 +988,7 @@
                         </div>
                         <div class="info-item">
                             <div class="info-label">角色</div>
-                            <div class="info-value">${player.role}</div>
+                            <div class="info-value role-name">${player.role}</div>
                         </div>
                         <div class="info-item">
                             <div class="info-label">资本</div>
@@ -964,7 +1001,7 @@
                     </div>
                     <div class="info-item">
                         <div class="info-label">秘密任务</div>
-                        <div class="info-value" style="font-size: 0.9em;">${roles[player.role].secretMission}</div>
+                        <div class="info-value secret-mission">${roles[player.role].secretMission}</div>
                     </div>
                 `;
                 container.appendChild(playerCard);
@@ -1367,37 +1404,58 @@
             const container = document.getElementById('buy-card-options');
             container.innerHTML = '';
             
+            // 添加玩家选择下拉框
+            const playerSelectDiv = document.createElement('div');
+            playerSelectDiv.innerHTML = `
+                <label for="buyer-select">选择购买玩家：</label>
+                <select id="buyer-select" class="player-select">
+                    ${gameState.players.map((player, index) => 
+                        `<option value="${index}">${player.name} (资本: ${player.capital})</option>`
+                    ).join('')}
+                </select>
+            `;
+            container.appendChild(playerSelectDiv);
+            
             // 生成3张随机卡片供购买
+            const cardsDiv = document.createElement('div');
+            cardsDiv.className = 'buy-cards-container';
             for (let i = 0; i < 3; i++) {
                 const card = getRandomTraitCard();
                 const cardElement = document.createElement('div');
                 cardElement.className = 'trait-card';
-                cardElement.onclick = () => buyTraitCard(card);
+                cardElement.onclick = () => buyTraitCard(card, cardElement);
                 cardElement.innerHTML = `
                     <h4>${card.trait} - ${card.name}</h4>
                     <p>${card.effect}</p>
                     <p><strong>价格: 30资本</strong></p>
                 `;
-                container.appendChild(cardElement);
+                cardsDiv.appendChild(cardElement);
             }
+            container.appendChild(cardsDiv);
         }
 
         // 购买特质卡
-        function buyTraitCard(card) {
-            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+        function buyTraitCard(card, cardElement) {
+            const buyerSelect = document.getElementById('buyer-select');
+            const buyerIndex = parseInt(buyerSelect.value);
+            const buyer = gameState.players[buyerIndex];
             
-            if (currentPlayer.capital >= 30) {
-                currentPlayer.capital -= 30;
-                currentPlayer.traitCards.push(card);
-                addLog(`${currentPlayer.name} 购买了特质卡：${card.name}`);
+            if (buyer.capital >= 30) {
+                buyer.capital -= 30;
+                buyer.traitCards.push(card);
+                addLog(`${buyer.name} 购买了特质卡：${card.name}`);
                 
                 // 更新显示
                 displayPlayers();
                 
                 // 移除已购买的卡片
-                event.target.remove();
+                cardElement.remove();
+                
+                // 更新玩家选择下拉框中的资本显示
+                const option = buyerSelect.querySelector(`option[value="${buyerIndex}"]`);
+                option.textContent = `${buyer.name} (资本: ${buyer.capital})`;
             } else {
-                alert('资本不足！');
+                alert(`${buyer.name} 资本不足！需要30资本，当前只有${buyer.capital}资本。`);
             }
         }
 
