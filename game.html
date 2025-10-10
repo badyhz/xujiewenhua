@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商业丛林法则 - 沙盘游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        /* 商业丛林背景效果 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 107, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(78, 205, 196, 0.1) 0%, transparent 50%);
+            z-index: -1;
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+        
+        @keyframes backgroundShift {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(-20px) translateY(-10px); }
+            50% { transform: translateX(20px) translateY(10px); }
+            75% { transform: translateX(-10px) translateY(20px); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px;
+            background: linear-gradient(145deg, rgba(139, 69, 19, 0.8), rgba(160, 82, 45, 0.8));
+            border-radius: 20px;
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.1), transparent);
+            animation: headerShine 4s ease-in-out infinite;
+        }
+        
+        @keyframes headerShine {
+            0%, 100% { left: -100%; }
+            50% { left: 100%; }
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ffd700, #ffed4e, #ffd700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+            animation: goldShimmer 3s ease-in-out infinite;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+        
+        @keyframes goldShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .game-section {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .game-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            margin-bottom: 25px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            border-bottom: 3px solid transparent;
+            border-image: linear-gradient(45deg, #FFD700, #FFA500) 1;
+            padding-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .player-setup {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .player-card {
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #555;
+            transition: all 0.3s ease;
+        }
+
+        .player-card:hover {
+            border-color: #FFD700;
+            transform: translateY(-2px);
+        }
+
+        .player-card.active {
+            border-color: #00FF00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+        }
+
+        .player-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .info-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.9em;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .capital { color: #FFD700; }
+        .reputation { color: #87CEEB; }
+        .class-ruler { color: #FF6B6B; }
+        .class-middle { color: #4ECDC4; }
+        .class-worker { color: #95E1D3; }
+
+        .btn {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1a1a1a;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 8px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 
+                0 8px 25px rgba(255, 215, 0, 0.4),
+                0 3px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .btn:disabled {
+            background: linear-gradient(45deg, #666, #555);
+            color: #999;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled::before {
+            display: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .cooperate-btn {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+            color: white;
+        }
+
+        .betray-btn {
+            background: linear-gradient(45deg, #FF416C, #FF4B2B);
+            color: white;
+        }
+
+        .game-controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .round-info {
+            background: linear-gradient(45deg, #2C3E50, #34495E);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .round-info h3 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #FFD700;
+        }
+
+        .opportunity-card {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #FFD700;
+        }
+
+        .trait-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .trait-card {
+            background: linear-gradient(135deg, #4a4a4a, #5a5a5a);
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trait-card:hover {
+            border-color: #FFD700;
+            transform: scale(1.05);
+        }
+
+        .trait-card.selected {
+            border-color: #00FF00;
+            background: linear-gradient(135deg, #2a5a2a, #3a6a3a);
+        }
+
+        .cooperation-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .player-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .player-option {
+            background: #3a3a3a;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .player-option:hover {
+            border-color: #FFD700;
+        }
+
+        .player-option.selected {
+            border-color: #00FF00;
+            background: #2a5a2a;
+        }
+
+        .decision-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .cooperate-btn {
+            background: linear-gradient(45deg, #56ab2f, #a8e6cf);
+        }
+
+        .betray-btn {
+            background: linear-gradient(45deg, #FF416C, #FF4B2B);
+        }
+
+        .results-panel {
+            background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .final-results {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .personality-tag {
+            font-size: 2em;
+            color: #FFD700;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #2a2a2a, #3a3a3a);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .log-panel {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #FFD700;
+            padding-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .player-setup {
+                grid-template-columns: 1fr;
+            }
+            
+            .decision-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .tag {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+            font-weight: bold;
+        }
+
+        .final-rank-item {
+            transition: transform 0.3s ease;
+        }
+
+        .final-rank-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .class-ruler {
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .class-middle {
+            color: #87ceeb;
+            font-weight: bold;
+        }
+
+        .class-worker {
+            color: #dda0dd;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ 商业丛林法则</h1>
+            <p>在这个残酷的商业世界中，你将如何生存？</p>
+        </div>
+
+        <!-- 游戏设置阶段 -->
+        <div id="setup-phase" class="game-section">
+            <h2 class="section-title">🎭 角色创建</h2>
+            <div class="game-controls">
+                <label for="player-count">玩家数量：</label>
+                <select id="player-count">
+                    <option value="6">6人</option>
+                    <option value="8">8人</option>
+                    <option value="10">10人</option>
+                    <option value="12">12人</option>
+                    <option value="15">15人</option>
+                    <option value="20">20人</option>
+                </select>
+                <button class="btn" onclick="initializeGame()">开始游戏</button>
+            </div>
+            <div id="players-container" class="player-setup"></div>
+        </div>
+
+        <!-- 游戏进行阶段 -->
+        <div id="game-phase" class="game-section hidden">
+            <div class="round-info">
+                <h3 id="round-title">第1轮 - 商机发布</h3>
+                <div id="opportunity-card" class="opportunity-card"></div>
+            </div>
+
+            <div id="current-player-info" class="game-section">
+                <h3 class="section-title">当前玩家信息</h3>
+                <div id="player-status"></div>
+            </div>
+
+            <div id="trait-selection" class="game-section">
+                <h3 class="section-title">选择特质卡</h3>
+                <div id="trait-cards-container" class="trait-cards"></div>
+            </div>
+
+            <div id="cooperation-phase" class="game-section">
+                <h3 class="section-title">合作决策</h3>
+                <div class="cooperation-panel">
+                    <p>选择合作对象（可选择独立行动）：</p>
+                    <div id="cooperation-options" class="player-list"></div>
+                    <div class="decision-buttons">
+                        <button class="btn cooperate-btn" onclick="makeDecision('cooperate')">履行合作</button>
+                        <button class="btn betray-btn" onclick="makeDecision('betray')">背叛</button>
+                        <button class="btn btn-secondary" onclick="makeDecision('independent')">独立行动</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="btn btn-success" onclick="nextPlayer()">下一位玩家</button>
+                <button class="btn btn-secondary" onclick="processRound()">结算本轮</button>
+            </div>
+        </div>
+
+        <!-- 结果显示 -->
+        <div id="results-phase" class="phase hidden">
+            <h2>第<span id="current-round-display">1</span>轮结果</h2>
+            <div id="round-results"></div>
+            <button class="btn" onclick="nextRound()">下一轮</button>
+        </div>
+
+        <!-- 最终结果阶段 -->
+        <div id="final-results" class="phase hidden">
+            <h2>游戏结束</h2>
+            <div id="final-ranking"></div>
+            <button class="btn" onclick="restartGame()">重新开始</button>
+        </div>
+
+        <!-- 游戏日志 -->
+        <div class="game-section">
+            <h3 class="section-title">📝 游戏日志</h3>
+            <div id="game-log" class="log-panel"></div>
+        </div>
+    </div>
+
+    <script>
+        // 游戏数据结构
+        let gameState = {
+            players: [],
+            currentRound: 1,
+            currentPlayerIndex: 0,
+            maxRounds: 5,
+            gamePhase: 'setup', // setup, playing, results, final
+            roundDecisions: [],
+            gameLog: []
+        };
+
+        // 角色定义
+        const roles = {
+            '掠夺者': {
+                traits: ['指南针', '岩石', '火焰'],
+                description: '天生领袖，目标明确，意志如铁',
+                secretMission: '游戏结束时资本排名第1',
+                specialSkill: '强权征服：在合作中强制多分30%收益（声望-15）',
+                initialCapital: 300,
+                initialReputation: 70
+            },
+            '操盘手': {
+                traits: ['镜面', '桥梁', '水流'],
+                description: '幕后布局者，洞察人性弱点',
+                secretMission: '资本进入前3，且至少成功背叛2次',
+                specialSkill: '信息欺诈：伪造1份合作契约内容',
+                initialCapital: 150,
+                initialReputation: 50
+            },
+            '教父': {
+                traits: ['岩石', '桥梁', '盾牌'],
+                description: '秩序建立者，恩威并施',
+                secretMission: '拥有≥2名"狗腿子"且资本前5',
+                specialSkill: '收编令：指定1名无产者成为狗腿子',
+                initialCapital: 300,
+                initialReputation: 70
+            },
+            '孤狼': {
+                traits: ['岩石', '筋骨', '盾牌'],
+                description: '极致专业者，不屑人情世故',
+                secretMission: '个人资本≥200（独立行动收益×1.2）',
+                specialSkill: '独行：本轮独立行动收益+50%，不可合作',
+                initialCapital: 150,
+                initialReputation: 50
+            },
+            '鬣狗': {
+                traits: ['镜面', '水流', '火焰'],
+                description: '机会主义清道夫，嗅觉灵敏',
+                secretMission: '背叛次数≥3次且存活到最后',
+                specialSkill: '趁火打劫：当他人合作失败时，可窃取其损失资本的30%',
+                initialCapital: 50,
+                initialReputation: 30
+            },
+            '狗腿子': {
+                traits: ['筋骨', '桥梁'],
+                description: '执行者，忠诚、高效',
+                secretMission: '所属教父资本进入前3',
+                specialSkill: '忠诚执行：为教父完成任务时，收益+20%',
+                initialCapital: 50,
+                initialReputation: 30
+            }
+        };
+
+        // 特质卡定义
+        const traitCards = {
+            '岩石': [
+                { name: '坚守', effect: '免疫本轮市场动荡损失', cost: 0 },
+                { name: '不可动摇', effect: '免疫声望损失', cost: 0 }
+            ],
+            '筋骨': [
+                { name: '执行', effect: '独立行动收益+20%', cost: 0 },
+                { name: '耐力', effect: '生存成本减半', cost: 0 }
+            ],
+            '水流': [
+                { name: '转向', effect: '放弃当前项目，转投另一项目', cost: 0 },
+                { name: '适应', effect: '合作失败时损失减半', cost: 0 }
+            ],
+            '指南针': [
+                { name: '锁定', effect: '本轮所有收益+15%', cost: 0 },
+                { name: '方向感', effect: '预知商机卡内容', cost: 0 }
+            ],
+            '镜面': [
+                { name: '洞察', effect: '查看1位合作方是否背叛', cost: 0 },
+                { name: '识人', effect: '查看他人角色身份', cost: 0 }
+            ],
+            '火焰': [
+                { name: '激励', effect: '指定项目，所有参与者收益+10%', cost: 0 },
+                { name: '感染', effect: '说服他人改变决策', cost: 0 }
+            ],
+            '盾牌': [
+                { name: '防御', effect: '免疫背叛的额外损失', cost: 0 },
+                { name: '隔离', effect: '本轮不受他人特质卡影响', cost: 0 }
+            ],
+            '桥梁': [
+                { name: '合纵', effect: '组建≤3人联盟，收益+20%', cost: 0 },
+                { name: '连接', effect: '促成他人合作，获得10%佣金', cost: 0 }
+            ]
+        };
+
+        // 商机卡定义
+        const opportunityCards = [
+            {
+                name: '蓝海市场',
+                description: '新兴市场机会',
+                rules: '独立行动：50资本；2人合作：各40资本；3人以上：各30资本'
+            },
+            {
+                name: '战略并购',
+                description: '高风险高收益项目',
+                rules: '仅限2人合作，成功各+80资本；若背叛，背叛者+120，被背叛者-40'
+            },
+            {
+                name: '重大危机',
+                description: '市场动荡期',
+                rules: '所有人-20资本，合作者可互相分担损失'
+            },
+            {
+                name: '政策红利',
+                description: '政府扶持项目',
+                rules: '声望>60者额外+30资本，合作可共享红利'
+            },
+            {
+                name: '技术革命',
+                description: '颠覆性创新机会',
+                rules: '独立行动风险大，合作可降低风险提高收益'
+            }
+        ];
+
+        // 初始化游戏
+        function initializeGame() {
+            const playerCount = parseInt(document.getElementById('player-count').value);
+            gameState.players = [];
+            gameState.currentRound = 1;
+            gameState.currentPlayerIndex = 0;
+            gameState.roundDecisions = [];
+            gameState.gameLog = [];
+
+            // 分配阶级和角色
+            const classDistribution = distributeClasses(playerCount);
+            
+            for (let i = 0; i < playerCount; i++) {
+                const playerClass = classDistribution[i];
+                const availableRoles = getRolesForClass(playerClass);
+                const role = availableRoles[Math.floor(Math.random() * availableRoles.length)];
+                
+                const player = {
+                    id: i + 1,
+                    name: `玩家${i + 1}`,
+                    class: playerClass,
+                    role: role,
+                    capital: roles[role].initialCapital,
+                    reputation: roles[role].initialReputation,
+                    traitCards: getInitialTraitCards(playerClass, role),
+                    usedTraitCard: null,
+                    cooperationHistory: [],
+                    betrayalCount: 0,
+                    isActive: i === 0
+                };
+                
+                gameState.players.push(player);
+            }
+
+            displayPlayers();
+            startGame();
+            addLog(`游戏开始！共${playerCount}名玩家参与`);
+        }
+
+        // 分配阶级
+        function distributeClasses(playerCount) {
+            const distribution = [];
+            const rulerCount = Math.max(1, Math.floor(playerCount * 0.1));
+            const middleCount = Math.floor(playerCount * 0.4);
+            const workerCount = playerCount - rulerCount - middleCount;
+
+            for (let i = 0; i < rulerCount; i++) distribution.push('统治阶级');
+            for (let i = 0; i < middleCount; i++) distribution.push('中产阶级');
+            for (let i = 0; i < workerCount; i++) distribution.push('无产阶级');
+
+            return distribution;
+        }
+
+        // 获取阶级对应的角色
+        function getRolesForClass(playerClass) {
+            switch (playerClass) {
+                case '统治阶级':
+                    return ['掠夺者', '教父'];
+                case '中产阶级':
+                    return ['操盘手', '孤狼'];
+                case '无产阶级':
+                    return ['鬣狗', '狗腿子'];
+                default:
+                    return ['孤狼'];
+            }
+        }
+
+        // 获取初始特质卡
+        function getInitialTraitCards(playerClass, role) {
+            const roleTraits = roles[role].traits;
+            const cards = [];
+            
+            roleTraits.forEach(trait => {
+                const availableCards = traitCards[trait];
+                const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+                cards.push({ ...randomCard, trait: trait });
+            });
+
+            // 根据阶级添加额外卡片
+            const extraCards = playerClass === '统治阶级' ? 1 : 0;
+            for (let i = 0; i < extraCards; i++) {
+                const allTraits = Object.keys(traitCards);
+                const randomTrait = allTraits[Math.floor(Math.random() * allTraits.length)];
+                const availableCards = traitCards[randomTrait];
+                const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+                cards.push({ ...randomCard, trait: randomTrait });
+            }
+
+            return cards;
+        }
+
+        // 显示玩家信息
+        function displayPlayers() {
+            const container = document.getElementById('players-container');
+            container.innerHTML = '';
+
+            gameState.players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = `player-card ${player.isActive ? 'active' : ''}`;
+                playerCard.innerHTML = `
+                    <h3>${player.name}</h3>
+                    <div class="player-info">
+                        <div class="info-item">
+                            <div class="info-label">阶级</div>
+                            <div class="info-value class-${player.class === '统治阶级' ? 'ruler' : player.class === '中产阶级' ? 'middle' : 'worker'}">${player.class}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">角色</div>
+                            <div class="info-value">${player.role}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">资本</div>
+                            <div class="info-value capital">${player.capital}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">声望</div>
+                            <div class="info-value reputation">${player.reputation}</div>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">秘密任务</div>
+                        <div class="info-value" style="font-size: 0.9em;">${roles[player.role].secretMission}</div>
+                    </div>
+                `;
+                container.appendChild(playerCard);
+            });
+        }
+
+        // 开始游戏
+        function startGame() {
+            document.getElementById('setup-phase').classList.add('hidden');
+            document.getElementById('game-phase').classList.remove('hidden');
+            gameState.gamePhase = 'playing';
+            
+            startNewRound();
+        }
+
+        // 开始新回合
+        function startNewRound() {
+            // 支付生存成本
+            gameState.players.forEach(player => {
+                player.capital = Math.max(0, player.capital - 20);
+            });
+
+            // 抽取商机卡
+            const opportunity = opportunityCards[Math.floor(Math.random() * opportunityCards.length)];
+            
+            document.getElementById('round-title').textContent = `第${gameState.currentRound}轮 - ${opportunity.name}`;
+            document.getElementById('opportunity-card').innerHTML = `
+                <h4>${opportunity.name}</h4>
+                <p>${opportunity.description}</p>
+                <p><strong>规则：</strong>${opportunity.rules}</p>
+            `;
+
+            gameState.currentPlayerIndex = 0;
+            gameState.roundDecisions = [];
+            
+            updateCurrentPlayerDisplay();
+            addLog(`第${gameState.currentRound}轮开始 - 商机：${opportunity.name}`);
+        }
+
+        // 更新当前玩家显示
+        function updateCurrentPlayerDisplay() {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 更新玩家状态
+            gameState.players.forEach((player, index) => {
+                player.isActive = index === gameState.currentPlayerIndex;
+            });
+            
+            displayPlayers();
+            
+            // 显示当前玩家信息
+            document.getElementById('player-status').innerHTML = `
+                <h4>当前玩家：${currentPlayer.name}</h4>
+                <p>角色：${currentPlayer.role}</p>
+                <p>资本：<span class="capital">${currentPlayer.capital}</span></p>
+                <p>声望：<span class="reputation">${currentPlayer.reputation}</span></p>
+            `;
+
+            // 显示特质卡
+            displayTraitCards(currentPlayer);
+            
+            // 显示合作选项
+            displayCooperationOptions(currentPlayer);
+        }
+
+        // 显示特质卡
+        function displayTraitCards(player) {
+            const container = document.getElementById('trait-cards-container');
+            container.innerHTML = '';
+
+            player.traitCards.forEach((card, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.className = 'trait-card';
+                cardElement.onclick = () => selectTraitCard(index);
+                cardElement.innerHTML = `
+                    <h4>${card.trait} - ${card.name}</h4>
+                    <p>${card.effect}</p>
+                `;
+                container.appendChild(cardElement);
+            });
+        }
+
+        // 选择特质卡
+        function selectTraitCard(cardIndex) {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 清除之前的选择
+            document.querySelectorAll('.trait-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // 选择新卡片
+            document.querySelectorAll('.trait-card')[cardIndex].classList.add('selected');
+            currentPlayer.selectedTraitCard = cardIndex;
+        }
+
+        // 显示合作选项
+        function displayCooperationOptions(currentPlayer) {
+            const container = document.getElementById('cooperation-options');
+            container.innerHTML = '';
+
+            gameState.players.forEach(player => {
+                if (player.id !== currentPlayer.id && player.reputation > 0) {
+                    const option = document.createElement('div');
+                    option.className = 'player-option';
+                    option.onclick = () => selectCooperationTarget(player.id);
+                    option.innerHTML = `
+                        <div>${player.name}</div>
+                        <div class="capital">${player.capital}</div>
+                        <div class="reputation">${player.reputation}</div>
+                    `;
+                    container.appendChild(option);
+                }
+            });
+        }
+
+        // 选择合作目标
+        function selectCooperationTarget(playerId) {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            // 清除之前的选择
+            document.querySelectorAll('.player-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // 选择新目标
+            event.target.closest('.player-option').classList.add('selected');
+            currentPlayer.selectedTarget = playerId;
+        }
+
+        // 做出决策
+        function makeDecision(decision) {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            const playerDecision = {
+                playerId: currentPlayer.id,
+                decision: decision,
+                target: currentPlayer.selectedTarget || null,
+                traitCard: currentPlayer.selectedTraitCard !== undefined ? currentPlayer.selectedTraitCard : null
+            };
+
+            gameState.roundDecisions.push(playerDecision);
+            
+            addLog(`${currentPlayer.name} 做出决策：${decision === 'cooperate' ? '合作' : decision === 'betray' ? '背叛' : '独立行动'}`);
+            
+            // 使用特质卡
+            if (playerDecision.traitCard !== null) {
+                const usedCard = currentPlayer.traitCards[playerDecision.traitCard];
+                currentPlayer.usedTraitCard = usedCard;
+                addLog(`${currentPlayer.name} 使用特质卡：${usedCard.name}`);
+            }
+        }
+
+        // 下一位玩家
+        function nextPlayer() {
+            gameState.currentPlayerIndex++;
+            
+            if (gameState.currentPlayerIndex >= gameState.players.length) {
+                // 所有玩家都完成决策，进入结算阶段
+                processRound();
+            } else {
+                updateCurrentPlayerDisplay();
+            }
+        }
+
+        // 处理回合结算
+        function processRound() {
+            document.getElementById('game-phase').classList.add('hidden');
+            document.getElementById('results-phase').classList.remove('hidden');
+            
+            const results = calculateRoundResults();
+            displayRoundResults(results);
+            
+            // 重置玩家状态
+            gameState.players.forEach(player => {
+                player.selectedTraitCard = undefined;
+                player.selectedTarget = null;
+                player.usedTraitCard = null;
+            });
+            
+            addLog(`第${gameState.currentRound}轮结算完成`);
+        }
+
+        // 计算回合结果
+        function calculateRoundResults() {
+            const results = [];
+            const cooperationMap = new Map();
+            
+            // 建立合作关系映射
+            gameState.roundDecisions.forEach(decision => {
+                if (decision.decision === 'cooperate' && decision.target) {
+                    const targetDecision = gameState.roundDecisions.find(d => d.playerId === decision.target);
+                    if (targetDecision && targetDecision.target === decision.playerId && targetDecision.decision === 'cooperate') {
+                        // 双方都选择合作
+                        cooperationMap.set(decision.playerId, { partner: decision.target, mutual: true });
+                        cooperationMap.set(decision.target, { partner: decision.playerId, mutual: true });
+                    } else if (targetDecision && targetDecision.target === decision.playerId && targetDecision.decision === 'betray') {
+                        // 对方背叛
+                        cooperationMap.set(decision.playerId, { partner: decision.target, mutual: false, betrayed: true });
+                        cooperationMap.set(decision.target, { partner: decision.playerId, mutual: false, betrayer: true });
+                    }
+                }
+            });
+
+            // 计算每个玩家的收益
+            gameState.players.forEach(player => {
+                const decision = gameState.roundDecisions.find(d => d.playerId === player.id);
+                if (!decision) return;
+
+                let capitalChange = 0;
+                let reputationChange = 0;
+                let resultText = '';
+
+                const cooperation = cooperationMap.get(player.id);
+                
+                if (decision.decision === 'independent') {
+                    // 独立行动
+                    capitalChange = 50;
+                    
+                    // 应用特质卡效果
+                    if (player.usedTraitCard) {
+                        if (player.usedTraitCard.name === '执行') {
+                            capitalChange = Math.floor(capitalChange * 1.2);
+                        } else if (player.usedTraitCard.name === '锁定') {
+                            capitalChange = Math.floor(capitalChange * 1.15);
+                        }
+                    }
+                    
+                    // 孤狼角色独立行动收益加成
+                    if (player.role === '孤狼') {
+                        capitalChange = Math.floor(capitalChange * 1.2);
+                    }
+                    
+                    resultText = `独立行动获得${capitalChange}资本`;
+                    
+                } else if (cooperation && cooperation.mutual) {
+                    // 双方合作成功
+                    capitalChange = 40;
+                    reputationChange = 5;
+                    
+                    // 应用特质卡效果
+                    if (player.usedTraitCard) {
+                        if (player.usedTraitCard.name === '合纵') {
+                            capitalChange = Math.floor(capitalChange * 1.2);
+                        } else if (player.usedTraitCard.name === '激励') {
+                            capitalChange = Math.floor(capitalChange * 1.1);
+                            // 给合作伙伴也加成
+                            const partner = gameState.players.find(p => p.id === cooperation.partner);
+                            if (partner) {
+                                // 这里需要在后面处理伙伴的加成
+                            }
+                        }
+                    }
+                    
+                    resultText = `合作成功，获得${capitalChange}资本，声望+${reputationChange}`;
+                    
+                } else if (cooperation && cooperation.betrayed) {
+                    // 被背叛
+                    capitalChange = -25;
+                    reputationChange = 5; // 被背叛者仍获得声望
+                    
+                    // 应用特质卡效果
+                    if (player.usedTraitCard) {
+                        if (player.usedTraitCard.name === '防御') {
+                            capitalChange = Math.floor(capitalChange * 0.5); // 减少损失
+                        } else if (player.usedTraitCard.name === '适应') {
+                            capitalChange = Math.floor(capitalChange * 0.5);
+                        }
+                    }
+                    
+                    resultText = `被背叛，损失${Math.abs(capitalChange)}资本，但声望+${reputationChange}`;
+                    
+                } else if (cooperation && cooperation.betrayer) {
+                    // 背叛他人
+                    capitalChange = 60;
+                    reputationChange = -15;
+                    player.betrayalCount++;
+                    
+                    resultText = `背叛成功，获得${capitalChange}资本，声望${reputationChange}`;
+                    
+                } else if (decision.decision === 'cooperate' && !cooperation) {
+                    // 想合作但没有找到合作伙伴
+                    capitalChange = 25; // 获得少量资本
+                    resultText = `未找到合作伙伴，独自行动获得${capitalChange}资本`;
+                }
+
+                // 应用市场动荡（随机事件）
+                if (Math.random() < 0.2) { // 20%概率
+                    const volatility = Math.floor(Math.random() * 20) - 10; // -10到+10
+                    if (player.usedTraitCard && player.usedTraitCard.name === '坚守' && volatility < 0) {
+                        // 免疫负面市场动荡
+                        resultText += '，免疫市场动荡';
+                    } else {
+                        capitalChange += volatility;
+                        if (volatility > 0) {
+                            resultText += `，市场利好+${volatility}`;
+                        } else {
+                            resultText += `，市场动荡${volatility}`;
+                        }
+                    }
+                }
+
+                // 应用变化
+                player.capital = Math.max(0, player.capital + capitalChange);
+                player.reputation = Math.max(0, Math.min(100, player.reputation + reputationChange));
+                
+                // 检查阶级流动
+                checkClassMobility(player);
+                
+                results.push({
+                    player: player,
+                    capitalChange: capitalChange,
+                    reputationChange: reputationChange,
+                    resultText: resultText
+                });
+            });
+
+            return results;
+        }
+
+        // 检查阶级流动
+        function checkClassMobility(player) {
+            const sortedPlayers = [...gameState.players].sort((a, b) => b.capital - a.capital);
+            const playerRank = sortedPlayers.findIndex(p => p.id === player.id) + 1;
+            const totalPlayers = gameState.players.length;
+            
+            let newClass = player.class;
+            
+            // 晋升条件
+            if (player.class === '无产阶级' && playerRank <= Math.ceil(totalPlayers * 0.4)) {
+                newClass = '中产阶级';
+            } else if (player.class === '中产阶级' && playerRank <= Math.ceil(totalPlayers * 0.1)) {
+                newClass = '统治阶级';
+            }
+            
+            // 跌落条件
+            if (player.class === '统治阶级' && playerRank > Math.ceil(totalPlayers * 0.3)) {
+                newClass = '中产阶级';
+                player.reputation = Math.max(0, player.reputation - 30); // 信任危机
+                addLog(`${player.name} 遭遇信任危机，声望-30`);
+            } else if (player.class === '中产阶级' && playerRank > Math.ceil(totalPlayers * 0.7)) {
+                newClass = '无产阶级';
+            }
+            
+            if (newClass !== player.class) {
+                addLog(`${player.name} 从${player.class}${newClass === '统治阶级' ? '晋升' : newClass === '无产阶级' ? '跌落' : '转变'}为${newClass}`);
+                player.class = newClass;
+                player.reputation += newClass === '统治阶级' ? 10 : 0;
+                
+                // 晋升奖励特质卡
+                if (newClass === '统治阶级' || newClass === '中产阶级') {
+                    const newCard = getRandomTraitCard();
+                    player.traitCards.push(newCard);
+                    addLog(`${player.name} 获得新特质卡：${newCard.name}`);
+                }
+            }
+        }
+
+        // 获取随机特质卡
+        function getRandomTraitCard() {
+            const allTraits = Object.keys(traitCards);
+            const randomTrait = allTraits[Math.floor(Math.random() * allTraits.length)];
+            const availableCards = traitCards[randomTrait];
+            const randomCard = availableCards[Math.floor(Math.random() * availableCards.length)];
+            return { ...randomCard, trait: randomTrait };
+        }
+
+        // 显示回合结果
+        function displayRoundResults(results) {
+            const container = document.getElementById('round-results');
+            container.innerHTML = '<h3>本轮结果</h3>';
+
+            results.forEach(result => {
+                const resultElement = document.createElement('div');
+                resultElement.style.marginBottom = '15px';
+                resultElement.style.padding = '10px';
+                resultElement.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                resultElement.style.borderRadius = '5px';
+                resultElement.innerHTML = `
+                    <p><strong>${result.player.name}</strong> (${result.player.role}): ${result.resultText}</p>
+                    <p>当前资本: <span class="capital">${result.player.capital}</span>, 
+                       当前声望: <span class="reputation">${result.player.reputation}</span>,
+                       阶级: <span class="class-${result.player.class === '统治阶级' ? 'ruler' : result.player.class === '中产阶级' ? 'middle' : 'worker'}">${result.player.class}</span></p>
+                `;
+                container.appendChild(resultElement);
+            });
+
+            // 添加购卡选项
+            const buyCardSection = document.createElement('div');
+            buyCardSection.innerHTML = `
+                <h4>购买特质卡 (30资本/张)</h4>
+                <div id="buy-card-options" class="trait-cards"></div>
+                <button class="btn" onclick="showBuyCardOptions()">显示可购买卡片</button>
+            `;
+            container.appendChild(buyCardSection);
+        }
+
+        // 显示购卡选项
+        function showBuyCardOptions() {
+            const container = document.getElementById('buy-card-options');
+            container.innerHTML = '';
+            
+            // 生成3张随机卡片供购买
+            for (let i = 0; i < 3; i++) {
+                const card = getRandomTraitCard();
+                const cardElement = document.createElement('div');
+                cardElement.className = 'trait-card';
+                cardElement.onclick = () => buyTraitCard(card);
+                cardElement.innerHTML = `
+                    <h4>${card.trait} - ${card.name}</h4>
+                    <p>${card.effect}</p>
+                    <p><strong>价格: 30资本</strong></p>
+                `;
+                container.appendChild(cardElement);
+            }
+        }
+
+        // 购买特质卡
+        function buyTraitCard(card) {
+            const currentPlayer = gameState.players[gameState.currentPlayerIndex];
+            
+            if (currentPlayer.capital >= 30) {
+                currentPlayer.capital -= 30;
+                currentPlayer.traitCards.push(card);
+                addLog(`${currentPlayer.name} 购买了特质卡：${card.name}`);
+                
+                // 更新显示
+                displayPlayers();
+                
+                // 移除已购买的卡片
+                event.target.remove();
+            } else {
+                alert('资本不足！');
+            }
+        }
+
+        // 下一轮
+        function nextRound() {
+            if (gameState.currentRound >= 5) {
+                endGame();
+                return;
+            }
+            
+            gameState.currentRound++;
+            gameState.currentPlayerIndex = 0;
+            gameState.roundDecisions = [];
+            
+            // 重置所有玩家状态
+            gameState.players.forEach(player => {
+                player.selectedTraitCard = undefined;
+                player.selectedTarget = null;
+                player.usedTraitCard = null;
+            });
+            
+            document.getElementById('results-phase').classList.add('hidden');
+            document.getElementById('game-phase').classList.remove('hidden');
+            
+            addLog(`开始第${gameState.currentRound}轮`);
+            updateGameDisplay();
+        }
+
+        // 结束游戏
+        function endGame() {
+            document.getElementById('results-phase').classList.add('hidden');
+            document.getElementById('final-results').classList.remove('hidden');
+            
+            // 计算最终排名
+            const finalRanking = [...gameState.players].sort((a, b) => {
+                // 首先按资本排序，然后按声望排序
+                if (b.capital !== a.capital) return b.capital - a.capital;
+                return b.reputation - a.reputation;
+            });
+            
+            // 生成标签
+            finalRanking.forEach((player, index) => {
+                player.finalRank = index + 1;
+                player.tags = generatePlayerTags(player);
+            });
+            
+            displayFinalResults(finalRanking);
+        }
+
+        // 生成玩家标签
+        function generatePlayerTags(player) {
+            const tags = [];
+            
+            // 基于最终排名的标签
+            if (player.finalRank === 1) {
+                tags.push('商业巨头');
+            } else if (player.finalRank <= 2) {
+                tags.push('成功企业家');
+            } else if (player.finalRank >= gameState.players.length - 1) {
+                tags.push('商场失意者');
+            }
+            
+            // 基于背叛次数的标签
+            if (player.betrayalCount >= 3) {
+                tags.push('背叛专家');
+            } else if (player.betrayalCount === 0) {
+                tags.push('诚信商人');
+            }
+            
+            // 基于声望的标签
+            if (player.reputation >= 80) {
+                tags.push('声誉卓著');
+            } else if (player.reputation <= 20) {
+                tags.push('声名狼藉');
+            }
+            
+            // 基于阶级的标签
+            if (player.class === '统治阶级') {
+                tags.push('权力精英');
+            } else if (player.class === '无产阶级' && player.capital > 200) {
+                tags.push('草根逆袭');
+            }
+            
+            // 基于角色特性的标签
+            if (player.role === '孤狼' && player.finalRank <= 2) {
+                tags.push('独行侠');
+            } else if (player.role === '合作者' && player.betrayalCount === 0) {
+                tags.push('团队精神');
+            } else if (player.role === '投机者' && player.capital >= 300) {
+                tags.push('投机天才');
+            }
+            
+            // 基于特质卡数量的标签
+            if (player.traitCards.length >= 5) {
+                tags.push('资源大师');
+            }
+            
+            return tags.slice(0, 3); // 最多3个标签
+        }
+
+        // 显示最终结果
+        function displayFinalResults(ranking) {
+            const container = document.getElementById('final-ranking');
+            container.innerHTML = '<h3>最终排名</h3>';
+            
+            ranking.forEach((player, index) => {
+                const rankElement = document.createElement('div');
+                rankElement.className = 'final-rank-item';
+                rankElement.style.marginBottom = '20px';
+                rankElement.style.padding = '15px';
+                rankElement.style.backgroundColor = index === 0 ? 'rgba(255,215,0,0.2)' : 
+                                                   index === 1 ? 'rgba(192,192,192,0.2)' : 
+                                                   index === 2 ? 'rgba(205,127,50,0.2)' : 
+                                                   'rgba(255,255,255,0.1)';
+                rankElement.style.borderRadius = '10px';
+                rankElement.style.border = index === 0 ? '2px solid gold' : '1px solid rgba(255,255,255,0.3)';
+                
+                const medal = index === 0 ? '🏆' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}`;
+                
+                rankElement.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4>${medal} ${player.name}</h4>
+                            <p>角色: ${player.role} | 阶级: ${player.class}</p>
+                            <p>资本: <span class="capital">${player.capital}</span> | 声望: <span class="reputation">${player.reputation}</span></p>
+                            <p>背叛次数: ${player.betrayalCount} | 特质卡: ${player.traitCards.length}张</p>
+                        </div>
+                    </div>
+                    <div class="player-tags" style="margin-top: 10px;">
+                        ${player.tags.map(tag => `<span class="tag">${tag}</span>`).join(' ')}
+                    </div>
+                `;
+                container.appendChild(rankElement);
+            });
+            
+            // 添加游戏统计
+            const statsElement = document.createElement('div');
+            statsElement.innerHTML = `
+                <h3>游戏统计</h3>
+                <p>总轮数: 5轮</p>
+                <p>总背叛次数: ${ranking.reduce((sum, p) => sum + p.betrayalCount, 0)}</p>
+                <p>平均资本: ${Math.round(ranking.reduce((sum, p) => sum + p.capital, 0) / ranking.length)}</p>
+                <p>平均声望: ${Math.round(ranking.reduce((sum, p) => sum + p.reputation, 0) / ranking.length)}</p>
+            `;
+            container.appendChild(statsElement);
+        }
+
+        // 重新开始游戏
+        function restartGame() {
+            // 重置游戏状态
+            gameState = {
+                players: [],
+                currentRound: 1,
+                currentPlayerIndex: 0,
+                roundDecisions: [],
+                gameLog: []
+            };
+            
+            // 隐藏所有阶段，显示角色创建
+            document.getElementById('final-results').classList.add('hidden');
+            document.getElementById('character-creation').classList.remove('hidden');
+            
+            // 清空输入
+            document.getElementById('player-name').value = '';
+            document.getElementById('player-count').value = '4';
+            
+            // 清空显示
+            document.getElementById('players-list').innerHTML = '';
+            document.getElementById('game-log').innerHTML = '';
+        }
+
+        // 添加日志
+        function addLog(message) {
+            gameState.gameLog.push({
+                timestamp: new Date().toLocaleTimeString(),
+                message: message
+            });
+
+            const logContainer = document.getElementById('game-log');
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `[${gameState.gameLog[gameState.gameLog.length - 1].timestamp}] ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('欢迎来到商业丛林法则！');
+        });
+
+        // 更新游戏显示
+        function updateGameDisplay() {
+            // 更新当前轮数显示
+            const roundDisplays = document.querySelectorAll('#current-round-display, .round-indicator');
+            roundDisplays.forEach(display => {
+                display.textContent = gameState.currentRound;
+            });
+            
+            // 更新玩家信息显示
+            displayPlayers();
+            
+            // 更新当前玩家指示
+            const currentPlayerName = gameState.players[gameState.currentPlayerIndex]?.name || '';
+            const currentPlayerDisplays = document.querySelectorAll('.current-player-name');
+            currentPlayerDisplays.forEach(display => {
+                display.textContent = currentPlayerName;
+            });
+        }
+
+        // 计算玩家综合得分（用于最终排名）
+        function calculatePlayerScore(player) {
+            let score = 0;
+            
+            // 资本权重 (40%)
+            score += player.capital * 0.4;
+            
+            // 声望权重 (30%)
+            score += player.reputation * 3 * 0.3; // 声望最大100，乘以3使其与资本相当
+            
+            // 阶级加成 (20%)
+            const classBonus = {
+                '统治阶级': 100,
+                '中产阶级': 50,
+                '无产阶级': 0
+            };
+            score += classBonus[player.class] * 0.2;
+            
+            // 特质卡数量加成 (10%)
+            score += player.traitCards.length * 10 * 0.1;
+            
+            // 背叛惩罚
+            score -= player.betrayalCount * 20;
+            
+            return Math.round(score);
+        }
+
+        // 获取玩家排名
+        function getPlayerRanking() {
+            return [...gameState.players]
+                .map(player => ({
+                    ...player,
+                    score: calculatePlayerScore(player)
+                }))
+                .sort((a, b) => b.score - a.score)
+                .map((player, index) => ({
+                    ...player,
+                    rank: index + 1
+                }));
+        }
+
+        // 显示实时排名
+        function displayCurrentRanking() {
+            const ranking = getPlayerRanking();
+            const container = document.getElementById('current-ranking');
+            
+            if (container) {
+                container.innerHTML = '<h4>当前排名</h4>';
+                ranking.forEach(player => {
+                    const rankElement = document.createElement('div');
+                    rankElement.style.padding = '5px';
+                    rankElement.style.marginBottom = '5px';
+                    rankElement.style.backgroundColor = 'rgba(255,255,255,0.1)';
+                    rankElement.style.borderRadius = '3px';
+                    rankElement.innerHTML = `
+                        <span>${player.rank}. ${player.name}</span>
+                        <span style="float: right;">得分: ${player.score}</span>
+                    `;
+                    container.appendChild(rankElement);
+                });
+            }
+        }
+
+        // 添加商机卡系统
+        const businessOpportunities = [
+            {
+                name: '科技创新',
+                description: '投资新兴科技项目',
+                cost: 80,
+                reward: { capital: 120, reputation: 10 },
+                risk: 0.3,
+                requirements: { class: ['统治阶级', '中产阶级'] }
+            },
+            {
+                name: '市场扩张',
+                description: '开拓新的市场领域',
+                cost: 60,
+                reward: { capital: 90, reputation: 5 },
+                risk: 0.2,
+                requirements: {}
+            },
+            {
+                name: '人才收购',
+                description: '挖掘竞争对手的核心人才',
+                cost: 40,
+                reward: { capital: 50, reputation: -5 },
+                risk: 0.1,
+                requirements: {}
+            },
+            {
+                name: '政府合作',
+                description: '与政府部门建立合作关系',
+                cost: 100,
+                reward: { capital: 80, reputation: 20 },
+                risk: 0.4,
+                requirements: { reputation: 60 }
+            },
+            {
+                name: '慈善活动',
+                description: '组织大型慈善活动提升形象',
+                cost: 50,
+                reward: { capital: 20, reputation: 25 },
+                risk: 0.1,
+                requirements: {}
+            }
+        ];
+
+        // 生成商机卡
+        function generateBusinessOpportunity() {
+            const availableOpportunities = businessOpportunities.filter(opp => {
+                const player = gameState.players[gameState.currentPlayerIndex];
+                
+                // 检查阶级要求
+                if (opp.requirements.class && !opp.requirements.class.includes(player.class)) {
+                    return false;
+                }
+                
+                // 检查声望要求
+                if (opp.requirements.reputation && player.reputation < opp.requirements.reputation) {
+                    return false;
+                }
+                
+                // 检查资本要求
+                if (player.capital < opp.cost) {
+                    return false;
+                }
+                
+                return true;
+            });
+            
+            if (availableOpportunities.length === 0) return null;
+            
+            return availableOpportunities[Math.floor(Math.random() * availableOpportunities.length)];
+        }
+
+        // 处理商机卡
+        function handleBusinessOpportunity(opportunity, accept) {
+            const player = gameState.players[gameState.currentPlayerIndex];
+            
+            if (!accept) {
+                addLog(`${player.name} 放弃了商机：${opportunity.name}`);
+                return;
+            }
+            
+            if (player.capital < opportunity.cost) {
+                addLog(`${player.name} 资本不足，无法投资${opportunity.name}`);
+                return;
+            }
+            
+            player.capital -= opportunity.cost;
+            
+            // 计算风险
+            const success = Math.random() > opportunity.risk;
+            
+            if (success) {
+                player.capital += opportunity.reward.capital;
+                player.reputation = Math.max(0, Math.min(100, player.reputation + opportunity.reputation));
+                addLog(`${player.name} 投资${opportunity.name}成功！获得${opportunity.reward.capital}资本，声望${opportunity.reward.reputation > 0 ? '+' : ''}${opportunity.reward.reputation}`);
+            } else {
+                // 失败只损失投资，不获得收益
+                addLog(`${player.name} 投资${opportunity.name}失败，损失${opportunity.cost}资本`);
+            }
+            
+            displayPlayers();
+        }
+    </script>
+</body>
+</html>
