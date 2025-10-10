@@ -456,6 +456,32 @@
             padding-left: 10px;
         }
 
+        /* 增强触摸友好性 */
+        .btn, .player-option, .trait-card, .game-controls select, .player-select {
+            -webkit-tap-highlight-color: rgba(255, 215, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .btn:active, .player-option:active, .trait-card:active {
+            transform: scale(0.98);
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* 增加触摸区域 */
+        .trait-card::before, .player-option::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            z-index: -1;
+        }
+        
+        .trait-card, .player-option {
+            position: relative;
+        }
+
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
@@ -467,70 +493,103 @@
             }
             
             .header h1 {
-                font-size: 2.2em;
-                margin-bottom: 10px;
+                font-size: 2.5em; /* 增大标题字体 */
+                margin-bottom: 12px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); /* 增强文字阴影 */
             }
             
             .header p {
-                font-size: 1em;
+                font-size: 1.1em; /* 增大副标题字体 */
+                line-height: 1.5; /* 增加行高 */
             }
             
             .game-section {
-                padding: 20px 15px;
-                margin-bottom: 15px;
+                padding: 25px 20px; /* 增加内边距 */
+                margin-bottom: 20px;
             }
             
             .section-title {
-                font-size: 1.4em;
-                margin-bottom: 15px;
+                font-size: 1.6em; /* 增大章节标题字体 */
+                margin-bottom: 20px;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* 增强文字阴影 */
             }
             
             .player-setup {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 20px; /* 增加间距 */
             }
             
             .player-card {
-                padding: 15px;
+                padding: 20px; /* 增加内边距 */
+                border-width: 3px; /* 增加边框宽度 */
             }
             
             .player-info {
                 grid-template-columns: 1fr;
-                gap: 8px;
+                gap: 12px; /* 增加间距 */
             }
             
             .info-item {
-                padding: 10px;
+                padding: 15px 12px; /* 增加内边距 */
+                border-radius: 8px;
+            }
+            
+            .info-label {
+                font-size: 1em; /* 增大标签字体 */
+                color: #e0e0e0; /* 提高对比度 */
+                margin-bottom: 8px;
+                font-weight: 600; /* 增加字重 */
+            }
+            
+            .info-value {
+                font-size: 1.4em; /* 增大数值字体 */
+                font-weight: bold;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); /* 增强文字阴影 */
+            }
+            
+            .role-name {
+                font-size: 1.3em; /* 增大角色名字体 */
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            }
+            
+            .secret-mission {
+                font-size: 1em; /* 增大秘密任务字体 */
+                line-height: 1.4;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
             }
             
             .trait-cards {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 15px; /* 增加间距 */
             }
             
             .trait-card {
-                padding: 12px;
-                font-size: 14px;
+                padding: 18px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                line-height: 1.4; /* 增加行高 */
+                border-width: 3px; /* 增加边框宽度 */
             }
             
             .player-list {
                 grid-template-columns: 1fr 1fr;
-                gap: 8px;
+                gap: 12px; /* 增加间距 */
             }
             
             .decision-buttons {
                 flex-direction: column;
                 align-items: center;
-                gap: 10px;
+                gap: 15px; /* 增加间距 */
             }
             
             .btn {
                 width: 100%;
-                max-width: 280px;
-                padding: 12px 20px;
-                font-size: 14px;
-                margin: 5px 0;
-                min-height: 44px; /* 确保触摸友好 */
+                max-width: 320px; /* 增大按钮宽度 */
+                padding: 16px 24px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                margin: 8px 0; /* 增加外边距 */
+                min-height: 50px; /* 增大最小高度 */
+                font-weight: bold;
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
             }
             
             .game-controls {
@@ -539,86 +598,103 @@
             
             .game-controls select {
                 width: 100%;
-                max-width: 200px;
-                padding: 12px;
-                margin: 10px 0;
-                border-radius: 8px;
-                border: 2px solid #666;
-                background: #2a2a2a;
-                color: white;
-                font-size: 16px;
-                min-height: 44px; /* 确保触摸友好 */
+                max-width: 250px; /* 增大选择框宽度 */
+                padding: 16px; /* 增加内边距 */
+                margin: 15px 0; /* 增加外边距 */
+                border-radius: 10px;
+                border: 3px solid #888; /* 增加边框宽度和对比度 */
+                background: #1a1a1a; /* 更深的背景色 */
+                color: #ffffff;
+                font-size: 18px; /* 增大字体 */
+                min-height: 50px; /* 增大最小高度 */
+                font-weight: 600;
             }
             
             .round-info {
-                padding: 15px;
+                padding: 20px; /* 增加内边距 */
             }
             
             .round-info h3 {
-                font-size: 1.4em;
+                font-size: 1.6em; /* 增大字体 */
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
             }
             
             .opportunity-card {
-                padding: 15px;
-                margin: 10px 0;
-                font-size: 14px;
-                line-height: 1.4;
+                padding: 20px; /* 增加内边距 */
+                margin: 15px 0; /* 增加外边距 */
+                font-size: 16px; /* 增大字体 */
+                line-height: 1.5; /* 增加行高 */
+                border-left-width: 6px; /* 增加左边框宽度 */
             }
             
             .cooperation-panel {
-                padding: 15px;
+                padding: 20px; /* 增加内边距 */
             }
             
             .results-panel {
-                padding: 20px 15px;
+                padding: 25px 20px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                line-height: 1.5;
             }
             
             .final-results {
-                padding: 20px 15px;
+                padding: 25px 20px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                line-height: 1.5;
             }
             
             .modal-content {
-                padding: 20px 15px;
+                padding: 25px 20px; /* 增加内边距 */
                 margin: 20px;
                 width: calc(100% - 40px);
-                max-height: 80vh;
+                max-height: 85vh; /* 增加最大高度 */
                 overflow-y: auto;
+                font-size: 16px; /* 增大字体 */
+                line-height: 1.5;
             }
             
             .log-panel {
-                padding: 10px;
-                font-size: 0.8em;
-                max-height: 150px;
+                padding: 15px; /* 增加内边距 */
+                font-size: 14px; /* 增大字体 */
+                max-height: 180px; /* 增加最大高度 */
+                line-height: 1.4;
             }
             
             .player-select {
                 max-width: 100%;
-                font-size: 16px; /* 防止iOS缩放 */
-                min-height: 44px;
+                font-size: 18px; /* 增大字体 */
+                min-height: 50px; /* 增大最小高度 */
+                padding: 16px; /* 增加内边距 */
+                border-width: 3px; /* 增加边框宽度 */
+                font-weight: 600;
             }
             
             .buy-cards-container {
                 grid-template-columns: 1fr;
-                gap: 10px;
+                gap: 15px; /* 增加间距 */
             }
             
             .player-option {
-                padding: 12px;
-                font-size: 14px;
-                min-height: 44px;
+                padding: 16px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                min-height: 50px; /* 增大最小高度 */
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border-width: 3px; /* 增加边框宽度 */
+                font-weight: 600;
             }
         }
         
         @media (max-width: 480px) {
             .header h1 {
-                font-size: 1.8em;
+                font-size: 2.2em; /* 进一步增大标题字体 */
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
             }
             
             .section-title {
-                font-size: 1.2em;
+                font-size: 1.4em; /* 增大章节标题字体 */
+                text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.9);
             }
             
             .player-list {
@@ -626,59 +702,78 @@
             }
             
             .btn {
-                padding: 12px 15px;
-                font-size: 14px;
-                min-height: 48px;
+                padding: 18px 20px; /* 增加内边距 */
+                font-size: 17px; /* 增大字体 */
+                min-height: 54px; /* 增大最小高度 */
+                font-weight: bold;
             }
             
             .info-value {
-                font-size: 1em;
+                font-size: 1.3em; /* 增大数值字体 */
+            }
+            
+            .info-label {
+                font-size: 1.1em; /* 增大标签字体 */
+                font-weight: 600;
             }
             
             .trait-card {
-                padding: 12px;
-                font-size: 13px;
+                padding: 20px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                line-height: 1.5; /* 增加行高 */
             }
             
             .game-controls select {
-                font-size: 16px;
-                padding: 14px;
-                min-height: 48px;
+                font-size: 18px; /* 增大字体 */
+                padding: 18px; /* 增加内边距 */
+                min-height: 54px; /* 增大最小高度 */
+                border-width: 3px;
             }
             
             .player-option {
-                padding: 14px;
-                font-size: 13px;
-                min-height: 48px;
+                padding: 18px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
+                min-height: 54px; /* 增大最小高度 */
+                font-weight: 600;
             }
             
             .modal-content {
-                margin: 10px;
-                width: calc(100% - 20px);
-                padding: 15px;
+                margin: 15px; /* 增加外边距 */
+                width: calc(100% - 30px);
+                padding: 20px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
             }
             
             .opportunity-card {
-                font-size: 13px;
-                padding: 12px;
+                font-size: 16px; /* 增大字体 */
+                padding: 18px; /* 增加内边距 */
+                line-height: 1.5;
             }
             
             .cooperation-panel {
-                padding: 12px;
+                padding: 18px; /* 增加内边距 */
             }
             
             .results-panel {
-                padding: 15px 10px;
+                padding: 20px 15px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
             }
             
             .final-results {
-                padding: 15px 10px;
+                padding: 20px 15px; /* 增加内边距 */
+                font-size: 16px; /* 增大字体 */
             }
             
             .player-select {
-                font-size: 16px;
-                padding: 14px;
-                min-height: 48px;
+                font-size: 18px; /* 增大字体 */
+                padding: 18px; /* 增加内边距 */
+                min-height: 54px; /* 增大最小高度 */
+            }
+            
+            .log-entry {
+                font-size: 14px; /* 增大日志字体 */
+                padding: 8px; /* 增加内边距 */
+                margin: 8px 0; /* 增加外边距 */
             }
         }
 
@@ -803,7 +898,7 @@
             </div>
         </div>
 
-        <!-- 结果显示 -->
+        <!-- RESULT phase -->
         <div id="results-phase" class="phase hidden">
             <h2>第<span id="current-round-display">1</span>轮结果</h2>
             <div id="round-results"></div>
