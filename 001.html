@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>商业计划书：Prism Dynamics™️ (棱镜动力)</title>
+  <style>
+    :root{
+      --bg-main:#ffffff;--bg-secondary:#f5f5f7;--text-primary:#1d1d1f;--text-secondary:#515154;
+      --accent-primary:#0071e3;--border-color:#d2d2d7;--shadow-color:rgba(0,0,0,0.1)
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background:var(--bg-main);color:var(--text-primary);line-height:1.65;
+      -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale
+    }
+    .container{width:100%;max-width:1100px;margin:0 auto;padding:0 22px}
+    section{padding:6rem 0}
+    section.bg-secondary{background:var(--bg-secondary)}
+    h1,h2,h3,h4{font-weight:600;line-height:1.2;letter-spacing:-.5px}
+    h1{font-size:4rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem}
+    h2{font-size:2.8rem;color:var(--text-primary);margin-bottom:3rem;text-align:center}
+    h3{font-size:1.8rem;color:var(--text-primary);margin-bottom:1.5rem}
+    h4{font-size:1.2rem;color:var(--text-primary);font-weight:600;margin-bottom:1rem}
+    p{color:var(--text-secondary);margin-bottom:1.5rem;font-size:1.1rem}
+    ul{list-style:none}
+    ul li{position:relative;padding-left:30px;margin-bottom:1rem;color:var(--text-secondary);font-size:1.1rem}
+    ul li::before{content:'●';position:absolute;left:0;color:var(--accent-primary);font-size:1.2em;line-height:1}
+    .card{
+      background:var(--bg-main);border:1px solid var(--border-color);border-radius:1.5rem;
+      padding:2.5rem;margin-bottom:2rem;box-shadow:0 4px 12px var(--shadow-color)
+    }
+    .hero{text-align:center;padding:8rem 0;background:var(--bg-secondary)}
+    .hero .subtitle{font-size:1.5rem;color:var(--text-secondary);max-width:700px;margin:0 auto 2rem;line-height:1.5}
+    .grid{display:grid;gap:2rem}
+    .grid-2-cols{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+    .grid-3-cols{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+    /* 让 Step 卡片等高 */
+    #solution .grid.grid-2-cols .card{display:flex;flex-direction:column;justify-content:flex-start}
+    .case-study-card{display:flex;flex-direction:column;background:var(--bg-secondary);border:none}
+    .case-study-card .content{flex-grow:1}
+    .quote{font-size:1.25rem;font-weight:500;border-left:3px solid var(--accent-primary);
+      padding-left:1.5rem;margin:2rem 0;color:var(--text-primary)}
+    .highlight{color:var(--accent-primary);font-weight:600}
+    .team-analysis .card{background:var(--bg-secondary);border:none}
+    .qa-item{border-bottom:1px solid var(--border-color);padding:2rem 0}
+    .qa-item:last-child{border-bottom:none}
+    .qa-item summary{font-size:1.2rem;font-weight:600;cursor:pointer;list-style:none}
+    .qa-item summary::-webkit-details-marker{display:none}
+    .qa-item p{padding-top:1rem;font-size:1rem}
+    footer{text-align:center;padding:4rem 2rem;background:var(--bg-secondary);color:#86868b}
+    /* 雷达容器（替换图片） */
+    .radar-box{
+      width:100%;height:220px;border-radius:1rem;background:linear-gradient(180deg,#ffffff,#fbfbfd);
+      border:1px solid var(--border-color);margin-bottom:1.5rem;overflow:hidden
+    }
+    @media (max-width:768px){
+      h1{font-size:2.8rem} h2{font-size:2.2rem} section{padding:4rem 0} .hero{padding:5rem 0}
+    }
+  </style>
+</head>
+
+<body>
+  <header class="hero">
+    <div class="container">
+      <h1>Prism Dynamics™️</h1>
+      <p class="subtitle">人类潜能的数字操作系统 <br/>一份为定义未来人才标准的商业计划书</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- 时代机遇 -->
+    <section id="opportunity" class="bg-secondary">
+      <div class="container">
+        <h2>时代机遇：在迷雾中捕捉巨兽</h2>
+        <div class="card">
+          <p class="quote">当今世界最昂贵的成本，是<span class="highlight">“人的不确定性”</span>。</p>
+          <p>我们用财务报表分析生意，却用直觉和经验来管理最核心的资产——人才。这个市场空白，价值万亿。</p>
+          <p><strong class="highlight">Prism Dynamics™️</strong>，就是我们为此打造的解决方案。它不是又一个性格测试，而是全球首款<strong class="highlight">“动态多维人类潜能诊断系统”</strong>。我们将其定位为<strong class="highlight">“人才领域的CT扫描仪”</strong>，能清晰地透视个人与团队的优势、风险、以及潜能的底层结构，将“不确定”变为“确定”。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 核心资产 / 四步闭环 -->
+    <section id="solution">
+      <div class="container">
+        <h2>核心资产：无法被复制的数字护城河</h2>
+        <p style="text-align:center;max-width:800px;margin:-2rem auto 3rem;color:var(--text-secondary)">
+          我们的核心知识产权 PrismOS™️ 是一个四步闭环的诊断与校准流程，它构成了我们的技术壁垒。这套系统是未来所有商业模式的“收费站”。
+        </p>
+
+        <div class="grid grid-2-cols">
+          <div class="card">
+            <h4>Step 1: 自我认知层</h4>
+            <p>通过 80 道题的自评问卷，构建出个体的“主观自我”模型。</p>
+          </div>
+
+          <div class="card">
+            <h4>Step 2: 环境印记层</h4>
+            <p>独创的 200 个环境标签，精准捕捉外部环境在个体身上留下的“印记”。</p>
+          </div>
+
+          <div class="card">
+            <h4>Step 3: 专家校准层</h4>
+            <p>咨询师通过 80 道专业判断题进行“纠偏验证”，得到无限接近真实的“客观自我”。</p>
+          </div>
+
+          <div class="card">
+            <h4>Step 4: 本质核心层</h4>
+            <p>系统融合三层数据，通过专有算法，生成 14 维“潜能指纹”和 8 维“潜力结构”。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 商业模式 -->
+    <section id="business-model" class="bg-secondary">
+      <div class="container">
+        <h2>商业模式：双引擎驱动 + 现金牛引擎</h2>
+        <div class="card">
+          <h3>B2C/B2B 高端咨询 & “催化剂”会销模式</h3>
+          <p>我们设计了清晰、高利润的商业闭环。从服务渴望突破瓶颈的企业家，到为快速发展的企业提供团队基因诊断，我们的价值在于将人力资源管理，从“艺术”升级为“科学”。</p>
+          <p class="quote">我们的现金牛引擎——<span class="highlight">“催化剂”会销模式</span>，是一场精心设计的“价值体验剧场”。通过震撼的现场诊断、权威的科学背书、以及“认证领航员”（演员）的案例分享，我们创造一个强大的信任共振场，实现高效的现场闭环转化。它是一台<span class="highlight">高效的现金流制造机和品牌放大器</span>。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 创始团队基因解码（叙述） -->
+    <section id="team-analysis" class="team-analysis">
+      <div class="container">
+        <h2>创始团队基因解码：用我们的尺丈量自己</h2>
+        <p style="text-align:center;max-width:800px;margin:-2rem auto 3rem;color:var(--text-secondary)">
+          我们坚信，最强大的产品力，是解决我们自己的问题。我们将三位核心成员（匿名：A先生、B女士、C先生）的数据输入 PrismOS™️，生成了我们创始团队的“作战地图”。这既是案例，更是我们的战略起点。
+        </p>
+        <div class="card">
+          <h3>团队诊断快照：一个“非典型”的创始组合</h3>
+          <p><strong class="highlight">团队聚合画像：</strong>这是一个典型的“<span class="highlight">非均衡天才团队</span>”。</p>
+          <ul>
+            <li><strong class="highlight">尖刀优势 (Blade):</strong> 团队的<span class="highlight">创新潜力</span>与<span class="highlight">影响半径</span>维度得分极高。B女士与C先生的天赋在此叠加，确保了我们产品的前瞻性和市场的想象力。A先生强大的<span class="highlight">协作质量</span>和<span class="highlight">关系韧性</span>，则成为团队内部的超级粘合剂。</li>
+            <li><strong class="highlight">致命短板 (Baseline):</strong> 团队的<span class="highlight">目标推进力</span>与<span class="highlight">应变效率</span>（风险管理）维度得分 dangerously low。这是一个“想法很多，落地很少”的危险信号。三位成员在该维度的个人得分均不高，形成了团队层面的系统性风险。</li>
+          </ul>
+          <p class="quote"><strong>PrismOS™️ 核心洞察:</strong> 我们的创始团队拥有改变行业的颠覆性潜力，但如果不能解决执行力短板，我们很可能在“伟大的创意”和“下一个版本”的循环中耗尽所有资源。这个团队<span class="highlight">最紧急的任务不是寻找更多创意，而是建立执行的铁律</span>。</p>
+          <h4>基于数据的战略决策 (Now What):</h4>
+          <p>这份报告直接指导了我们最高优先级的战略决策：</p>
+          <ol style="list-style:decimal;padding-left:20px;color:var(--text-secondary)">
+            <li style="padding-left:10px;margin-bottom:1rem;"><strong>人才引进：</strong>下一个核心岗位锁定在“目标推进力/节奏管理”≥85 的 COO/项目负责人，并已用 PrismOS™️ 生成理想画像。</li>
+            <li style="padding-left:10px;margin-bottom:1rem;"><strong>流程建设：</strong>引入严格的 OKR 与周度复盘机制，用流程确定性弥补团队基因中的不确定性。</li>
+          </ol>
+          <p><strong>对投资人说：</strong>我们不仅创造了这个工具，我们还用它来导航自己的未来。这种透明度和自我认知，是我们成功的最大保障。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 个人案例：雷达模拟图替换图片 -->
+    <section id="case-studies" class="bg-secondary">
+      <div class="container">
+        <h2>个人案例：从“CT扫描”到商业价值的引爆</h2>
+        <div class="grid grid-3-cols">
+          <div class="card case-study-card">
+            <div id="radar-case-1" class="radar-box"></div>
+            <div class="content">
+              <h4>“被困住的 A+ 经理人”</h4>
+              <p class="quote">解锁领导力天花板</p>
+              <p><strong>洞察：</strong>完美的合作者，其高绩效的本质却是依赖集体来规避个人风险。系统提前十年预判了他的职业瓶颈。</p>
+              <p><strong>价值：</strong>为企业留住了一位未来的核心高管，价值百万。</p>
+            </div>
+          </div>
+
+          <div class="card case-study-card">
+            <div id="radar-case-2" class="radar-box"></div>
+            <div class="content">
+              <h4>“失控的创意天才”</h4>
+              <p class="quote">将天赋转化为生产力</p>
+              <p><strong>洞察：</strong>其天赋正在成为公司的诅咒。系统揭示其潜力与现实严重脱节，核心在于将想法转化为有序行动的能力缺失。</p>
+              <p><strong>价值：</strong>为投后管理提供了“创始人升级”的加速器，直接提升投资组合成功率。</p>
+            </div>
+          </div>
+
+          <div class="card case-study-card">
+            <div id="radar-case-3" class="radar-box"></div>
+            <div class="content">
+              <h4>“被埋没的创新引擎”</h4>
+              <p class="quote">精准的人才再配置</p>
+              <p><strong>洞察：</strong>即将被优化的“能力不行”的员工，实则是被放错了位置的天生创造者。</p>
+              <p><strong>价值：</strong>展现了“发现看不见的资产”的能力。这种“人才炼金术”，是所有成长型企业都梦寐以求的。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 投资人 Q&A -->
+    <section id="qa">
+      <div class="container">
+        <h2>投资人问答 (Q&A)</h2>
+        <p style="text-align:center;max-width:800px;margin:-2rem auto 3rem;color:var(--text-secondary)">
+          我们预见了您可能存在的疑虑，并在此提供坦诚、直接的回答。
+        </p>
+        <div class="card">
+          <details class="qa-item">
+            <summary>1. 市场上有那么多性格测试，你们的核心区别是什么？</summary>
+            <p>根本区别在于：<strong class="highlight">它们是“静态照片”，我们是“动态CT”</strong>。传统测试给出固定“类型”标签，忽略环境与发展变化。PrismOS™️ 通过多层数据校准，揭示特定情境下的<strong class="highlight">动态能力结构与潜力空间</strong>，并输出可执行清单。</p>
+          </details>
+          <details class="qa-item">
+            <summary>2. 算法有科学依据吗？如何保护 IP？</summary>
+            <p>模型根植于组织行为/认知心理等研究，并由顾问团持续迭代；权重与映射经历史数据回测。壁垒在于<strong class="highlight">四步闭环 + 复杂融合算法 + 语义/原型库</strong>的整体协同，而非单份问卷。</p>
+          </details>
+          <details class="qa-item">
+            <summary>3. 高端咨询很重，如何规模化？</summary>
+            <p>三级火箭：<strong>会销引擎</strong>获取高净值与企业订单；<strong>认证咨询师体系</strong>放大交付；<strong>轻量 SaaS</strong>覆盖更广企业，提供自助诊断与数据订阅。</p>
+          </details>
+          <details class="qa-item">
+            <summary>4. 数据隐私与安全？</summary>
+            <p>匿名化与加密存储；最小化采集；仅授权人可见；合规投入与研发同等级。</p>
+          </details>
+          <details class="qa-item">
+            <summary>5. 收费模式与 LTV？</summary>
+            <p>个人数万元；企业团队数十万至上百万；体验后形成<strong class="highlight">年度体检/战略导航</strong>的复购机制，LTV 高。</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>我们投资的不是一个软件，而是投资一个“定义未来人才标准”的平台。</p>
+      <p>&copy; 2025 Prism Dynamics™️. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <!-- 纯原生 SVG 雷达（ES5、零依赖） -->
+  <script>
+    "use strict";
+    function drawRadar(containerId, values, options){
+      var opt=options||{}, max=(typeof opt.max==='number')?opt.max:100, size=opt.size||220;
+      var rings=opt.rings||3, fillColor=opt.fillColor||"rgba(0,113,227,0.22)", strokeColor=opt.strokeColor||"#0071e3";
+      var ringColors=opt.ringColors||["#eef3ff","#f1f7ff","#ffffff"], ns="http://www.w3.org/2000/svg";
+      var box=document.getElementById(containerId); if(!box){return;} box.innerHTML="";
+      var svg=document.createElementNS(ns,"svg"); svg.setAttribute("viewBox","0 0 "+size+" "+size);
+      svg.style.width="100%"; svg.style.height="100%";
+      var cx=size/2, cy=size/2, pad=16, r=size/2-pad, i,n=values.length;
+
+      for(i=1;i<=rings;i++){
+        var rr=r*(i/rings), c=document.createElementNS(ns,"circle");
+        c.setAttribute("cx",cx); c.setAttribute("cy",cy); c.setAttribute("r",rr);
+        c.setAttribute("fill",ringColors[i-1]||"#ffffff"); c.setAttribute("stroke","#e6e9f2"); c.setAttribute("stroke-width","1");
+        svg.appendChild(c);
+      }
+      for(i=0;i<n;i++){
+        var ang=Math.PI*2*i/n - Math.PI/2, x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
+        var l=document.createElementNS(ns,"line"); l.setAttribute("x1",cx); l.setAttribute("y1",cy);
+        l.setAttribute("x2",x); l.setAttribute("y2",y); l.setAttribute("stroke","#d8deed"); l.setAttribute("stroke-width","1");
+        svg.appendChild(l);
+      }
+      var pts="", val;
+      for(i=0;i<n;i++){
+        val=values[i]; if(val<0) val=0; if(val>max) val=max;
+        var ang2=Math.PI*2*i/n - Math.PI/2, rr2=r*(val/max);
+        var px=cx+rr2*Math.cos(ang2), py=cy+rr2*Math.sin(ang2);
+        pts+=(i===0?"":" ")+px+","+py;
+      }
+      var poly=document.createElementNS(ns,"polygon"); poly.setAttribute("points",pts);
+      poly.setAttribute("fill",fillColor); poly.setAttribute("stroke",strokeColor); poly.setAttribute("stroke-width","2");
+      svg.appendChild(poly);
+
+      var minI=0,maxI=0; for(i=1;i<n;i++){ if(values[i]<values[minI]) minI=i; if(values[i]>values[maxI]) maxI=i; }
+      var hint=document.createElementNS(ns,"text"); hint.setAttribute("x",cx); hint.setAttribute("y",size-10);
+      hint.setAttribute("text-anchor","middle"); hint.setAttribute("fill","#6b7280"); hint.setAttribute("font-size","10");
+      hint.textContent="极值：最高 #"+(maxI+1)+" · 最低 #"+(minI+1); svg.appendChild(hint);
+
+      box.appendChild(svg);
+    }
+
+    // 示例数据（8维）
+    var case1=[82,78,74,68,60,72,86,80];   // 稍稳健
+    var case2=[95,42,38,55,34,48,92,88];   // 偏锋
+    var case3=[88,62,58,70,55,63,90,85];   // 潜力明显但不均衡
+
+    window.onload=function(){
+      drawRadar("radar-case-1", case1, {max:100,size:220,fillColor:"rgba(0,113,227,0.22)",strokeColor:"#0071e3",
+        ringColors:["#f0f5ff","#f7fbff","#ffffff"]});
+      drawRadar("radar-case-2", case2, {max:100,size:220,fillColor:"rgba(255,159,10,0.22)",strokeColor:"#ff9f0a",
+        ringColors:["#fff7ec","#fff3e6","#ffffff"]});
+      drawRadar("radar-case-3", case3, {max:100,size:220,fillColor:"rgba(52,199,89,0.22)",strokeColor:"#34c759",
+        ringColors:["#effaf3","#f5fdf7","#ffffff"]});
+    };
+  </script>
+</body>
+</html>
